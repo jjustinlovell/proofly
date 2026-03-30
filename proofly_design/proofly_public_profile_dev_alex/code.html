@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>dev_alex | Proofly Public Profile</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Space+Grotesk:wght@500;700&amp;family=JetBrains+Mono&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-background": "#e1e2eb",
+                        "surface-bright": "#363940",
+                        "on-primary-fixed": "#001849",
+                        "on-secondary-fixed": "#002106",
+                        "on-tertiary": "#3a3000",
+                        "on-tertiary-container": "#4c3f00",
+                        "tertiary-fixed": "#ffe16d",
+                        "on-error": "#690005",
+                        "surface-container-highest": "#32353c",
+                        "secondary-fixed": "#97f999",
+                        "secondary": "#7bdb80",
+                        "primary-fixed": "#dae2ff",
+                        "tertiary-container": "#c9a900",
+                        "inverse-on-surface": "#2e3037",
+                        "surface-variant": "#32353c",
+                        "surface-tint": "#b2c5ff",
+                        "inverse-surface": "#e1e2eb",
+                        "surface-container": "#1d2026",
+                        "primary": "#b2c5ff",
+                        "surface-container-high": "#272a31",
+                        "surface-container-lowest": "#0b0e14",
+                        "surface-container-low": "#191c22",
+                        "on-primary-fixed-variant": "#003fa3",
+                        "on-surface-variant": "#c3c6d7",
+                        "primary-container": "#5d8bff",
+                        "tertiary-fixed-dim": "#e9c400",
+                        "on-secondary-container": "#91f294",
+                        "on-error-container": "#ffdad6",
+                        "background": "#10131a",
+                        "tertiary": "#e9c400",
+                        "on-tertiary-fixed": "#221b00",
+                        "on-surface": "#e1e2eb",
+                        "on-primary": "#002b74",
+                        "secondary-fixed-dim": "#7bdb80",
+                        "error-container": "#93000a",
+                        "on-primary-container": "#002566",
+                        "on-secondary": "#00390e",
+                        "primary-fixed-dim": "#b2c5ff",
+                        "secondary-container": "#007124",
+                        "outline-variant": "#424654",
+                        "on-secondary-fixed-variant": "#005319",
+                        "outline": "#8d90a0",
+                        "on-tertiary-fixed-variant": "#544600",
+                        "surface-dim": "#10131a",
+                        "inverse-primary": "#0055d4",
+                        "surface": "#10131a",
+                        "error": "#ffb4ab"
+                    },
+                    fontFamily: {
+                        "headline": ["Inter"],
+                        "body": ["Inter"],
+                        "label": ["Space Grotesk"]
+                    },
+                    borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .verified-glow {
+            box-shadow: 0 0 12px rgba(233, 196, 0, 0.4);
+        }
+        .glass-card {
+            background: rgba(50, 53, 60, 0.6);
+            backdrop-filter: blur(12px);
+        }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #0b0e14; }
+        ::-webkit-scrollbar-thumb { background: #272a31; border-radius: 10px; }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body selection:bg-primary selection:text-on-primary">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 bg-[#10131a] dark:bg-[#10131a] font-['Inter'] antialiased">
+<div class="bg-[#191c22] flex items-center justify-between px-6 py-3 w-full max-w-[1440px] mx-auto">
+<div class="flex items-center gap-8">
+<span class="text-xl font-bold tracking-tight text-[#e1e2eb]">Proofly</span>
+<div class="hidden md:flex items-center gap-6">
+<a class="text-[#9497a1] hover:text-[#e1e2eb] transition-colors" href="#">Dashboard</a>
+<a class="text-[#b2c5ff] border-b-2 border-[#b2c5ff] pb-1" href="#">Public Profile</a>
+<a class="text-[#9497a1] hover:text-[#e1e2eb] transition-colors" href="#">CV Generator</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 text-[#9497a1] hover:bg-[#272a31] transition-all duration-200 active:scale-95">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="p-2 text-[#9497a1] hover:bg-[#272a31] transition-all duration-200 active:scale-95">
+<span class="material-symbols-outlined">terminal</span>
+</button>
+<img alt="User profile avatar" class="w-8 h-8 rounded-full border border-outline-variant/30" data-alt="Close-up portrait of a developer with glasses in a dark tech-focused environment with subtle blue backlighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBBTTvMVOzgm6ycTZ1vd5G9Gra__kAD3Gq6OAWsnjlnIrd5rRsRore-S_KuhdqGQtEr1mDu4hOydclu4-zo418VEYZ3_V-VidEbnX-EdnlKyZRV1aWmHk57XCbqNSyPLmzmGtKTz1xaXcKVwaphc8p8Bd6WMhgY1s29In14N1mTTA6R86glKOm-8x2IwoQovr3BE_QT5Y8cPQa5EalcUlqTs5nb1KzQ4obIWXxz6HA7Roe4KoKccwvKKnhkSnJRyV1VtGoaGDpEcCo"/>
+</div>
+</div>
+</nav>
+<main class="pt-24 pb-12 px-6 max-w-[1440px] mx-auto min-h-screen">
+<!-- Header Section: Identity & Quick Stats -->
+<header class="flex flex-col md:flex-row items-start md:items-end justify-between gap-8 mb-12">
+<div class="flex items-center gap-6">
+<div class="relative">
+<div class="w-32 h-32 rounded-xl overflow-hidden bg-surface-container-high border-2 border-primary/20">
+<img alt="dev_alex avatar" class="w-full h-full object-cover" data-alt="professional headshot of a software engineer with a confident expression, soft dramatic lighting, tech studio background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBklEP6aLTwnnwpLEyorfKRUeyatvcuWu2IpmMksuyFEFAwsjyioXx3BEXlIui_c3UOqsUHfe_UbHViS07jn9n-1GV5yA8FcTrapPzGVzAjI2Jwk4LLuweXXx3fT39OmTgpWQy103R12w-V2kCzsnvwFKbPqCsrUqMf3ReU39kI4aGPd-FqROpgNe1BHd1FoNKNjoVaijs7FpyfltpOKbAAiAiWMYK-J9CVWTdyBI4_Oa_hZPSyooEwpp4Kff3ccYucUZ_CaP5BWHg"/>
+</div>
+<div class="absolute -bottom-2 -right-2 bg-tertiary text-on-tertiary p-1.5 rounded-full verified-glow flex items-center justify-center border-4 border-background">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">verified</span>
+</div>
+</div>
+<div>
+<h1 class="text-4xl font-headline font-bold text-on-background tracking-tight">dev_alex</h1>
+<p class="text-on-surface-variant font-label text-sm uppercase tracking-widest mt-1">Full-Stack Architect &amp; Open Source Contributor</p>
+<div class="flex flex-wrap gap-2 mt-4">
+<span class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface-container-high border border-outline-variant/20 text-xs font-label text-tertiary">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">workspace_premium</span> 500+ LOGS
+                        </span>
+<span class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface-container-high border border-outline-variant/20 text-xs font-label text-secondary">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">verified_user</span> CORE MAINTAINER
+                        </span>
+</div>
+</div>
+</div>
+<div class="flex gap-4 w-full md:w-auto">
+<div class="flex-1 md:flex-none bg-surface-container-low p-4 rounded-lg border-l-4 border-primary">
+<p class="text-[0.65rem] font-label text-on-surface-variant uppercase tracking-tighter">Current Streak</p>
+<p class="text-3xl font-headline font-extrabold text-primary">12 DAYS</p>
+</div>
+<div class="flex-1 md:flex-none bg-surface-container-low p-4 rounded-lg border-l-4 border-tertiary">
+<p class="text-[0.65rem] font-label text-on-surface-variant uppercase tracking-tighter">Trust Score</p>
+<p class="text-3xl font-headline font-extrabold text-tertiary">98.4</p>
+</div>
+</div>
+</header>
+<!-- Main Content Grid -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-8">
+<!-- Left Side: Data Viz (8 columns) -->
+<div class="md:col-span-8 space-y-8">
+<!-- Proof Map (Heatmap) -->
+<section class="bg-surface-container-low rounded-xl p-6 border border-outline-variant/10">
+<div class="flex items-center justify-between mb-8">
+<h2 class="font-headline text-lg font-semibold flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">grid_view</span> Proof Map
+                        </h2>
+<span class="text-xs font-label text-on-surface-variant">YEAR 2024 ACTIVITY</span>
+</div>
+<div class="overflow-x-auto pb-4">
+<div class="flex flex-col gap-2 min-w-[700px]">
+<!-- Mock Heatmap Grid -->
+<div class="grid grid-cols-[repeat(52,1fr)] gap-1.5">
+<!-- Generate some random active/inactive cells -->
+<div class="w-full aspect-square bg-surface-container-highest/30 rounded-sm"></div>
+<div class="w-full aspect-square bg-secondary-container/40 rounded-sm"></div>
+<div class="w-full aspect-square bg-secondary rounded-sm"></div>
+<div class="w-full aspect-square bg-secondary-container rounded-sm"></div>
+<div class="w-full aspect-square bg-surface-container-highest/30 rounded-sm"></div>
+<div class="w-full aspect-square bg-surface-container-highest/30 rounded-sm"></div>
+<div class="w-full aspect-square bg-secondary/80 rounded-sm"></div>
+<!-- Repetitive patterns for visual effect -->
+<script>
+                                    const grid = document.currentScript.parentElement;
+                                    const levels = ['bg-surface-container-highest/30', 'bg-secondary-container/40', 'bg-secondary-container', 'bg-secondary/70', 'bg-secondary'];
+                                    for(let i=0; i<364-7; i++) {
+                                        const div = document.createElement('div');
+                                        div.className = `w-full aspect-square rounded-sm ${levels[Math.floor(Math.random() * 5)]}`;
+                                        grid.appendChild(div);
+                                    }
+                                </script>
+</div>
+</div>
+</div>
+<div class="mt-4 flex items-center justify-end gap-2 text-[0.65rem] font-label text-on-surface-variant uppercase">
+<span>Less</span>
+<div class="flex gap-1">
+<div class="w-3 h-3 bg-surface-container-highest/30 rounded-sm"></div>
+<div class="w-3 h-3 bg-secondary-container/40 rounded-sm"></div>
+<div class="w-3 h-3 bg-secondary-container rounded-sm"></div>
+<div class="w-3 h-3 bg-secondary/70 rounded-sm"></div>
+<div class="w-3 h-3 bg-secondary rounded-sm"></div>
+</div>
+<span>More</span>
+</div>
+</section>
+<!-- Top Languages & Skill Bento -->
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-8">
+<section class="bg-surface-container-low rounded-xl p-6 border border-outline-variant/10">
+<h2 class="font-headline text-lg font-semibold mb-6 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">pie_chart</span> Top Languages
+                        </h2>
+<div class="space-y-4">
+<div>
+<div class="flex justify-between text-xs font-label mb-1.5">
+<span>TypeScript</span>
+<span>64%</span>
+</div>
+<div class="h-1.5 w-full bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-primary rounded-full" style="width: 64%"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between text-xs font-label mb-1.5">
+<span>Rust</span>
+<span>22%</span>
+</div>
+<div class="h-1.5 w-full bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-secondary rounded-full" style="width: 22%"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between text-xs font-label mb-1.5">
+<span>Go</span>
+<span>10%</span>
+</div>
+<div class="h-1.5 w-full bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-tertiary rounded-full" style="width: 10%"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between text-xs font-label mb-1.5">
+<span>Other</span>
+<span>4%</span>
+</div>
+<div class="h-1.5 w-full bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-on-surface-variant/30 rounded-full" style="width: 4%"></div>
+</div>
+</div>
+</div>
+</section>
+<section class="bg-surface-container-lowest rounded-xl p-6 border border-outline-variant/5 flex flex-col justify-center items-center text-center">
+<div class="w-16 h-16 rounded-full bg-tertiary/10 flex items-center justify-center mb-4 verified-glow">
+<span class="material-symbols-outlined text-tertiary text-3xl" style="font-variation-settings: 'FILL' 1;">rewarded_ads</span>
+</div>
+<h3 class="font-headline font-bold text-xl mb-1">Consistency King</h3>
+<p class="text-sm text-on-surface-variant font-body">Earned for maintains a 30-day proof streak in major repositories.</p>
+<button class="mt-6 text-xs font-label uppercase tracking-widest text-primary hover:underline transition-all">View All Badges</button>
+</section>
+</div>
+<!-- Verified Logs Timeline -->
+<section class="space-y-6">
+<h2 class="font-headline text-lg font-semibold flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">history</span> Verified Work Stream
+                    </h2>
+<div class="relative border-l-2 border-outline-variant/20 ml-3 pl-8 space-y-12">
+<!-- Log Item 1 -->
+<div class="relative">
+<div class="absolute -left-[41px] top-0 w-5 h-5 rounded-full bg-background border-4 border-primary"></div>
+<div class="bg-surface-container p-5 rounded-xl border-l-4 border-primary">
+<div class="flex justify-between items-start mb-3">
+<span class="text-[0.65rem] font-label text-on-surface-variant uppercase bg-surface-container-high px-2 py-0.5 rounded">2 HOURS AGO</span>
+<span class="material-symbols-outlined text-secondary text-sm" style="font-variation-settings: 'FILL' 1;" title="Verified by Proofly">check_circle</span>
+</div>
+<h4 class="font-headline font-semibold text-on-background mb-2">Refactored Authentication Middleware</h4>
+<code class="block font-['JetBrains_Mono'] text-[0.8rem] text-primary/80 bg-surface-container-lowest p-3 rounded mb-4">
+                                    - JWT validation logic optimized<br/>
+                                    - Added Argon2id password hashing<br/>
+                                    - Fixed race condition in session clearing
+                                </code>
+<div class="flex items-center gap-4 text-[0.7rem] font-label text-on-surface-variant">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[1rem]">database</span> core-api</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[1rem]">commit</span> sha:8f2a1b</span>
+</div>
+</div>
+</div>
+<!-- Log Item 2 -->
+<div class="relative">
+<div class="absolute -left-[41px] top-0 w-5 h-5 rounded-full bg-background border-4 border-outline-variant/40"></div>
+<div class="bg-surface-container-low p-5 rounded-xl">
+<div class="flex justify-between items-start mb-3">
+<span class="text-[0.65rem] font-label text-on-surface-variant uppercase bg-surface-container-high px-2 py-0.5 rounded">YESTERDAY</span>
+<span class="material-symbols-outlined text-secondary text-sm" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<h4 class="font-headline font-semibold text-on-background mb-2">Designed Dark Mode System Tokens</h4>
+<p class="text-sm text-on-surface-variant mb-4 font-body">Integrated CSS variables for Material 3 design system alignment across 14 components.</p>
+<div class="flex items-center gap-4 text-[0.7rem] font-label text-on-surface-variant">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[1rem]">palette</span> ui-library</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[1rem]">commit</span> sha:e4d9c2</span>
+</div>
+</div>
+</div>
+<!-- Log Item 3 -->
+<div class="relative">
+<div class="absolute -left-[41px] top-0 w-5 h-5 rounded-full bg-background border-4 border-outline-variant/40"></div>
+<div class="bg-surface-container-low p-5 rounded-xl">
+<div class="flex justify-between items-start mb-3">
+<span class="text-[0.65rem] font-label text-on-surface-variant uppercase bg-surface-container-high px-2 py-0.5 rounded">2 DAYS AGO</span>
+<span class="material-symbols-outlined text-secondary text-sm" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<h4 class="font-headline font-semibold text-on-background mb-2">GraphQL Subscription Performance Fix</h4>
+<code class="block font-['JetBrains_Mono'] text-[0.8rem] text-primary/80 bg-surface-container-lowest p-3 rounded mb-4">
+                                    Implemented Redis pub/sub for scaling<br/>
+                                    Reduced payload size by 40% using field masking
+                                </code>
+<div class="flex items-center gap-4 text-[0.7rem] font-label text-on-surface-variant">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[1rem]">settings_input_component</span> api-gateway</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[1rem]">commit</span> sha:a1b2c3</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- Right Side: Sidebar Meta (4 columns) -->
+<aside class="md:col-span-4 space-y-8">
+<!-- Proof of Work Card -->
+<section class="glass-card rounded-xl p-8 border border-primary/20 relative overflow-hidden">
+<div class="absolute top-0 right-0 p-4 opacity-10">
+<span class="material-symbols-outlined text-6xl">verified</span>
+</div>
+<h3 class="font-headline font-bold text-2xl text-primary mb-2">Verified Ledger</h3>
+<p class="text-sm text-on-surface-variant mb-6 leading-relaxed">This profile is cryptographically linked to dev_alex's work history on Proofly Ledger.</p>
+<div class="space-y-3 mb-8">
+<div class="flex justify-between text-xs font-label">
+<span class="text-on-surface-variant">VALIDATED HOURS</span>
+<span class="text-on-background">1,240h</span>
+</div>
+<div class="flex justify-between text-xs font-label">
+<span class="text-on-surface-variant">AVG DAILY OUTPUT</span>
+<span class="text-on-background">4.2 Units</span>
+</div>
+<div class="flex justify-between text-xs font-label">
+<span class="text-on-surface-variant">NETWORK RANK</span>
+<span class="text-tertiary">TOP 1%</span>
+</div>
+</div>
+<button class="w-full bg-primary text-on-primary py-3 rounded-md font-label font-bold text-xs uppercase tracking-widest shadow-lg shadow-primary/20 hover:bg-primary-container transition-all active:scale-95">
+                        Download Verified CV
+                    </button>
+</section>
+<!-- Ecosystem Connections -->
+<section class="bg-surface-container-low rounded-xl p-6 border border-outline-variant/10">
+<h3 class="font-headline font-semibold mb-6 flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary">link</span> Ecosystem
+                    </h3>
+<div class="space-y-4">
+<div class="flex items-center gap-4 p-3 rounded-lg bg-surface-container hover:bg-surface-container-high transition-colors cursor-pointer group">
+<div class="w-10 h-10 rounded bg-on-background/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-on-background">terminal</span>
+</div>
+<div>
+<p class="text-sm font-bold">GitHub</p>
+<p class="text-xs text-on-surface-variant">@alex_dev_logs</p>
+</div>
+<span class="material-symbols-outlined ml-auto text-on-surface-variant group-hover:text-primary text-sm">open_in_new</span>
+</div>
+<div class="flex items-center gap-4 p-3 rounded-lg bg-surface-container hover:bg-surface-container-high transition-colors cursor-pointer group">
+<div class="w-10 h-10 rounded bg-on-background/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-on-background">work</span>
+</div>
+<div>
+<p class="text-sm font-bold">LinkedIn</p>
+<p class="text-xs text-on-surface-variant">Alex Proofington</p>
+</div>
+<span class="material-symbols-outlined ml-auto text-on-surface-variant group-hover:text-primary text-sm">open_in_new</span>
+</div>
+<div class="flex items-center gap-4 p-3 rounded-lg bg-surface-container hover:bg-surface-container-high transition-colors cursor-pointer group">
+<div class="w-10 h-10 rounded bg-on-background/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-on-background">code</span>
+</div>
+<div>
+<p class="text-sm font-bold">Personal Blog</p>
+<p class="text-xs text-on-surface-variant">alex.logs.io</p>
+</div>
+<span class="material-symbols-outlined ml-auto text-on-surface-variant group-hover:text-primary text-sm">open_in_new</span>
+</div>
+</div>
+</section>
+<!-- Location / Map Context -->
+<section class="bg-surface-container-low rounded-xl p-6 border border-outline-variant/10 overflow-hidden relative h-48 group">
+<div class="absolute inset-0 grayscale opacity-40 group-hover:grayscale-0 transition-all duration-700">
+<img alt="San Francisco Map" class="w-full h-full object-cover" data-alt="Modern dark-themed map visualization of San Francisco with glowing neon blue transit lines and minimalist topography" data-location="San Francisco" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCirwvG0kEdDpkk1RTSrcOZ2zOTFWAXJO7LAc-TWfm04amF_gUsLFO_aDbUfh-G_5ZZZ4CWEWLOikAlAqfzf5WXUzPfLjzSmPBVoIlPd2BAtuB6QlqbgMcHmlaqneK7W-vz4zPvXJ1JeK4uRf5YP54TquMbUjcxpCFdR6zrw_qGW9OTWTks8mPVHFlgQ6yVv2cKYua6rqWX3lEkbqbi0FXa_T91DOWIbIDBtQ4PFR6RtocNNdnGdMDYyvUhkVM6Ib6H7J8BfOS8NAs"/>
+</div>
+<div class="relative z-10 flex flex-col h-full justify-between">
+<span class="flex items-center gap-1.5 px-3 py-1 rounded bg-background/80 backdrop-blur-sm self-start text-[0.65rem] font-label text-primary">
+<span class="material-symbols-outlined text-sm">location_on</span> SF / BAY AREA
+                        </span>
+<p class="text-[0.6rem] font-label text-on-surface-variant bg-background/80 backdrop-blur-sm p-2 rounded uppercase tracking-tighter">Availability: Open to Consultations</p>
+</div>
+</section>
+</aside>
+</div>
+</main>
+<!-- Footer -->
+<footer class="bg-[#0b0e14] dark:bg-[#0b0e14] border-t border-[#424654]/15 w-full py-12">
+<div class="max-w-7xl mx-auto px-8 flex flex-col md:flex-row justify-between items-center gap-6">
+<span class="font-['Space_Grotesk'] font-bold text-[#e1e2eb]">Proofly Ledger</span>
+<div class="flex flex-wrap justify-center gap-8">
+<a class="font-['Inter'] text-sm text-[#9497a1] hover:text-[#e1e2eb] underline decoration-[#b2c5ff] opacity-80 hover:opacity-100 transition-colors" href="#">Docs</a>
+<a class="font-['Inter'] text-sm text-[#9497a1] hover:text-[#e1e2eb] underline decoration-[#b2c5ff] opacity-80 hover:opacity-100 transition-colors" href="#">Support</a>
+<a class="font-['Inter'] text-sm text-[#9497a1] hover:text-[#e1e2eb] underline decoration-[#b2c5ff] opacity-80 hover:opacity-100 transition-colors" href="#">Privacy</a>
+<a class="font-['Inter'] text-sm text-[#9497a1] hover:text-[#e1e2eb] underline decoration-[#b2c5ff] opacity-80 hover:opacity-100 transition-colors" href="#">GitHub Status</a>
+</div>
+<p class="font-['Inter'] text-sm text-[#9497a1]">© 2024 Proofly Ledger</p>
+</div>
+</footer>
+</body></html>

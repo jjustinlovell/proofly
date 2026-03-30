@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Space+Grotesk:wght@400;500;600;700&amp;family=JetBrains+Mono&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-background": "#e1e2eb",
+              "surface-bright": "#363940",
+              "on-primary-fixed": "#001849",
+              "on-secondary-fixed": "#002106",
+              "on-tertiary": "#3a3000",
+              "on-tertiary-container": "#4c3f00",
+              "tertiary-fixed": "#ffe16d",
+              "on-error": "#690005",
+              "surface-container-highest": "#32353c",
+              "secondary-fixed": "#97f999",
+              "secondary": "#7bdb80",
+              "primary-fixed": "#dae2ff",
+              "tertiary-container": "#c9a900",
+              "inverse-on-surface": "#2e3037",
+              "surface-variant": "#32353c",
+              "surface-tint": "#b2c5ff",
+              "inverse-surface": "#e1e2eb",
+              "surface-container": "#1d2026",
+              "primary": "#b2c5ff",
+              "surface-container-high": "#272a31",
+              "surface-container-lowest": "#0b0e14",
+              "surface-container-low": "#191c22",
+              "on-primary-fixed-variant": "#003fa3",
+              "on-surface-variant": "#c3c6d7",
+              "primary-container": "#5d8bff",
+              "tertiary-fixed-dim": "#e9c400",
+              "on-secondary-container": "#91f294",
+              "on-error-container": "#ffdad6",
+              "background": "#10131a",
+              "tertiary": "#e9c400",
+              "on-tertiary-fixed": "#221b00",
+              "on-surface": "#e1e2eb",
+              "on-primary": "#002b74",
+              "secondary-fixed-dim": "#7bdb80",
+              "error-container": "#93000a",
+              "on-primary-container": "#002566",
+              "on-secondary": "#00390e",
+              "primary-fixed-dim": "#b2c5ff",
+              "secondary-container": "#007124",
+              "outline-variant": "#424654",
+              "on-secondary-fixed-variant": "#005319",
+              "outline": "#8d90a0",
+              "on-tertiary-fixed-variant": "#544600",
+              "surface-dim": "#10131a",
+              "inverse-primary": "#0055d4",
+              "surface": "#10131a",
+              "error": "#ffb4ab"
+            },
+            fontFamily: {
+              "headline": ["Inter"],
+              "body": ["Inter"],
+              "label": ["Space Grotesk"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            background-color: #10131a;
+            color: #e1e2eb;
+            font-family: 'Inter', sans-serif;
+        }
+        .cv-preview-shadow {
+            box-shadow: 0 40px 100px -20px rgba(0,0,0,0.8);
+        }
+    </style>
+</head>
+<body class="dark overflow-x-hidden">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 bg-[#10131a] dark:bg-[#10131a] font-['Inter'] antialiased">
+<div class="flex items-center justify-between px-6 py-3 w-full max-w-[1440px] mx-auto bg-[#191c22]">
+<div class="text-xl font-bold tracking-tight text-[#e1e2eb]">Proofly</div>
+<div class="hidden md:flex items-center space-gap-8 gap-8">
+<a class="text-[#9497a1] hover:text-[#e1e2eb] transition-colors" href="#">Dashboard</a>
+<a class="text-[#9497a1] hover:text-[#e1e2eb] transition-colors" href="#">Public Profile</a>
+<a class="text-[#b2c5ff] border-b-2 border-[#b2c5ff] pb-1" href="#">CV Generator</a>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 text-[#9497a1] hover:bg-[#272a31] transition-all duration-200 active:scale-95">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="p-2 text-[#9497a1] hover:bg-[#272a31] transition-all duration-200 active:scale-95">
+<span class="material-symbols-outlined">terminal</span>
+</button>
+<div class="w-8 h-8 rounded-full bg-surface-container-high overflow-hidden border border-outline-variant/20">
+<img alt="User profile avatar" data-alt="close-up professional headshot of a software developer with soft cinematic lighting against a dark studio background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBG2NZnKMlw76cRZ-vCosmO8iFk5Xo3HhGKimQYz4I1d7kZmb3fodUcHPTdO_SM2v7nMTfcZPZURW2D4aMDI_vA0ByP2P43Y62b-hfV8FDmqax0OPBLYtJddgjGXsYSPNVYNU-xzwdnmWZUJyXvWF6eZRzDnSK7tNsmiOja-f99HmTWf5vGkIeX10iSLUDcXQuPQvGNf8ps-grbv_sNveHWWr9-pQuBtlTYdjHjcSxCqpp38T-YiA6niT5wWJ-pZR-cCtVjEO3HRBg"/>
+</div>
+</div>
+</div>
+</nav>
+<!-- SideNavBar -->
+<aside class="h-screen w-64 fixed left-0 top-0 pt-16 bg-[#0b0e14] dark:bg-[#0b0e14] flex flex-col border-r border-[#424654]/15 shadow-[20px_0_40px_rgba(0,0,0,0.4)] hidden lg:flex">
+<div class="px-6 py-8">
+<div class="flex items-center gap-3 mb-8">
+<div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center">
+<span class="material-symbols-outlined text-tertiary" style="font-variation-settings: 'FILL' 1;">stars</span>
+</div>
+<div>
+<div class="font-['Space_Grotesk'] uppercase tracking-wider text-[0.75rem] text-[#9497a1]">Current Streak</div>
+<div class="font-bold text-[#e1e2eb]">12 Days</div>
+</div>
+</div>
+<nav class="space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 font-['Space_Grotesk'] uppercase tracking-wider text-[0.75rem] text-[#9497a1] hover:bg-[#191c22] hover:text-[#e1e2eb] transition-all duration-300" href="#">
+<span class="material-symbols-outlined">dashboard</span> Overview
+                </a>
+<a class="flex items-center gap-3 px-4 py-3 font-['Space_Grotesk'] uppercase tracking-wider text-[0.75rem] text-[#9497a1] hover:bg-[#191c22] hover:text-[#e1e2eb] transition-all duration-300" href="#">
+<span class="material-symbols-outlined">edit_note</span> Daily Standup
+                </a>
+<a class="flex items-center gap-3 px-4 py-3 font-['Space_Grotesk'] uppercase tracking-wider text-[0.75rem] text-[#9497a1] hover:bg-[#191c22] hover:text-[#e1e2eb] transition-all duration-300" href="#">
+<span class="material-symbols-outlined">history</span> Logs
+                </a>
+<a class="flex items-center gap-3 px-4 py-3 font-['Space_Grotesk'] uppercase tracking-wider text-[0.75rem] text-[#9497a1] hover:bg-[#191c22] hover:text-[#e1e2eb] transition-all duration-300" href="#">
+<span class="material-symbols-outlined">settings</span> Settings
+                </a>
+</nav>
+<button class="mt-8 w-full py-3 bg-gradient-to-br from-primary to-primary-container text-on-primary font-bold rounded-md hover:opacity-90 transition-all active:scale-95 uppercase font-['Space_Grotesk'] text-xs tracking-widest">
+                Post Proof of Work
+            </button>
+</div>
+<div class="mt-auto px-6 py-8 border-t border-[#424654]/15">
+<nav class="space-y-1">
+<a class="flex items-center gap-3 px-4 py-2 font-['Space_Grotesk'] uppercase tracking-wider text-[0.75rem] text-[#9497a1] hover:text-[#e1e2eb]" href="#">
+<span class="material-symbols-outlined">description</span> Docs
+                </a>
+<a class="flex items-center gap-3 px-4 py-2 font-['Space_Grotesk'] uppercase tracking-wider text-[0.75rem] text-[#9497a1] hover:text-[#e1e2eb]" href="#">
+<span class="material-symbols-outlined">help</span> Support
+                </a>
+</nav>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="lg:pl-64 pt-16 min-h-screen bg-surface-dim">
+<div class="max-w-[1440px] mx-auto p-8 flex flex-col lg:flex-row gap-8">
+<!-- CV Preview Area -->
+<div class="flex-1 flex flex-col items-center">
+<div class="w-full flex justify-between items-center mb-6">
+<div class="flex items-center gap-4">
+<span class="font-['Space_Grotesk'] text-xs font-bold tracking-widest text-primary bg-primary/10 px-3 py-1 rounded">LIVE PREVIEW</span>
+<span class="text-sm text-on-surface-variant">Last updated 2 mins ago</span>
+</div>
+</div>
+<!-- The "Obsidian Ledger" CV Paper -->
+<div class="w-full max-w-2xl bg-[#ffffff] text-[#0b0e14] aspect-[1/1.41] p-12 cv-preview-shadow relative overflow-hidden flex flex-col">
+<!-- CV Header -->
+<header class="flex justify-between items-start mb-12">
+<div>
+<h1 class="text-4xl font-extrabold tracking-tighter mb-1 uppercase font-headline">Alex Chen</h1>
+<p class="text-lg font-medium text-slate-600 font-label tracking-tight">Full-stack Engineer &amp; Technical Architect</p>
+</div>
+<div class="w-24 h-24 bg-slate-100 p-2 rounded-sm border border-slate-200">
+<img alt="QR Code" class="w-full h-full opacity-80" data-alt="clean vector qr code representing a digital link to a professional developer profile on a white background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA7dYTPjqSX3X-CDPXAm3Gkl41Nyvn0_1GPfsy8yh0Hv1526weMUawZKziYOEUo5xbJaRXR-mWwRpwnkdJQOICHPxTjyZmr33HWkrcjKINPE4ntUozlbvLlBMBH4WbX6hyJ4u9AkXeryCd8jIEe-rfg0vcdRWwzV56UfAnP7k4NmywE_GqgfYNimn86LXwRI5h2VnQ4XjNIdxVo0iJWE1dF1lCLp0Pyzu0n8aE1-oIqmMhYUUhJ-7q9lN6r1pEk1aMZjMhBBN-xGYU"/>
+</div>
+</header>
+<!-- CV Grid -->
+<div class="grid grid-cols-12 gap-8 flex-1">
+<!-- Main Column -->
+<div class="col-span-8 space-y-8">
+<section>
+<h2 class="font-['Space_Grotesk'] text-xs font-bold tracking-[0.2em] uppercase border-b-2 border-slate-900 pb-1 mb-4">Verified Proof of Work</h2>
+<div class="space-y-6">
+<div class="relative pl-4 border-l-2 border-slate-100">
+<div class="absolute -left-[5px] top-1 w-2 h-2 bg-slate-900 rounded-full"></div>
+<div class="text-sm font-bold uppercase tracking-tight text-slate-400 mb-1">Q4 2023 — Present</div>
+<h3 class="font-bold text-lg leading-tight mb-2">Architectural Redesign: Core Engine</h3>
+<ul class="text-sm text-slate-700 space-y-2 font-['Inter']">
+<li>• Refactored 12,000+ lines of legacy TypeScript into modular microservices.</li>
+<li>• Optimized database query latency by 45% using intentional indexing.</li>
+<li>• Documented 84 consecutive days of verified contributions via Proofly.</li>
+</ul>
+</div>
+<div class="relative pl-4 border-l-2 border-slate-100">
+<div class="absolute -left-[5px] top-1 w-2 h-2 bg-slate-200 rounded-full"></div>
+<div class="text-sm font-bold uppercase tracking-tight text-slate-400 mb-1">Q2 2023 — Q3 2023</div>
+<h3 class="font-bold text-lg leading-tight mb-2">DevOps Pipeline Automation</h3>
+<ul class="text-sm text-slate-700 space-y-2 font-['Inter']">
+<li>• Automated multi-region deployment scripts for zero-downtime releases.</li>
+<li>• Integrated Proofly automated logging for developer standup compliance.</li>
+</ul>
+</div>
+</div>
+</section>
+</div>
+<!-- Sidebar Column -->
+<div class="col-span-4 space-y-8">
+<section>
+<h2 class="font-['Space_Grotesk'] text-xs font-bold tracking-[0.2em] uppercase border-b-2 border-slate-900 pb-1 mb-4">Top Languages</h2>
+<div class="space-y-3">
+<div class="flex justify-between items-center text-sm font-medium">
+<span>TypeScript</span>
+<span class="font-['Space_Grotesk'] text-slate-400">42%</span>
+</div>
+<div class="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
+<div class="bg-slate-900 h-full w-[42%]"></div>
+</div>
+<div class="flex justify-between items-center text-sm font-medium pt-2">
+<span>Rust</span>
+<span class="font-['Space_Grotesk'] text-slate-400">28%</span>
+</div>
+<div class="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
+<div class="bg-slate-900 h-full w-[28%]"></div>
+</div>
+<div class="flex justify-between items-center text-sm font-medium pt-2">
+<span>Python</span>
+<span class="font-['Space_Grotesk'] text-slate-400">15%</span>
+</div>
+<div class="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
+<div class="bg-slate-900 h-full w-[15%]"></div>
+</div>
+</div>
+</section>
+<section>
+<h2 class="font-['Space_Grotesk'] text-xs font-bold tracking-[0.2em] uppercase border-b-2 border-slate-900 pb-1 mb-4">Credentials</h2>
+<div class="p-3 bg-slate-50 border border-slate-100 rounded-sm">
+<div class="flex items-center gap-2 mb-2">
+<span class="material-symbols-outlined text-amber-500 text-sm" style="font-variation-settings: 'FILL' 1;">verified</span>
+<span class="text-[10px] font-bold uppercase tracking-widest text-slate-900">Proofly Verified</span>
+</div>
+<p class="text-[10px] text-slate-500 font-mono leading-tight">Ledger ID: 8xf2-k9m1-002p-99q2</p>
+</div>
+</section>
+</div>
+</div>
+<footer class="mt-auto pt-8 border-t border-slate-100 flex justify-between items-center">
+<span class="text-[10px] font-['Space_Grotesk'] text-slate-400 uppercase tracking-[0.3em]">Generated via Proofly.io</span>
+<span class="text-[10px] font-['Space_Grotesk'] text-slate-400 uppercase tracking-[0.3em]">October 2024</span>
+</footer>
+</div>
+</div>
+<!-- Controls Sidebar -->
+<div class="w-full lg:w-80 space-y-6">
+<!-- Action Card -->
+<div class="bg-surface-container p-6 rounded-xl border-l-4 border-primary">
+<h3 class="font-headline font-bold text-lg mb-4">Export Settings</h3>
+<div class="space-y-4">
+<div>
+<label class="block font-['Space_Grotesk'] text-[0.65rem] uppercase tracking-[0.2em] text-on-surface-variant mb-2">Date Range</label>
+<div class="grid grid-cols-3 gap-2">
+<button class="py-2 bg-surface-container-high text-xs font-bold rounded hover:bg-surface-container-highest transition-colors">30D</button>
+<button class="py-2 bg-primary text-on-primary text-xs font-bold rounded">90D</button>
+<button class="py-2 bg-surface-container-high text-xs font-bold rounded hover:bg-surface-container-highest transition-colors">ALL</button>
+</div>
+</div>
+<div>
+<label class="block font-['Space_Grotesk'] text-[0.65rem] uppercase tracking-[0.2em] text-on-surface-variant mb-2">Theme Profile</label>
+<div class="flex gap-4">
+<button class="flex-1 flex flex-col items-center gap-2 p-3 rounded-lg border border-primary bg-primary/5">
+<div class="w-full aspect-video bg-white rounded-sm border border-slate-200"></div>
+<span class="text-[10px] font-bold uppercase tracking-widest">Minimal Light</span>
+</button>
+<button class="flex-1 flex flex-col items-center gap-2 p-3 rounded-lg border border-outline-variant hover:bg-surface-container-high transition-colors">
+<div class="w-full aspect-video bg-slate-900 rounded-sm border border-slate-800"></div>
+<span class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Obsidian Dark</span>
+</button>
+</div>
+</div>
+<div class="pt-4 border-t border-outline-variant/30">
+<button class="w-full py-4 bg-gradient-to-br from-primary to-primary-container text-on-primary font-bold rounded-lg flex items-center justify-center gap-2 shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all">
+<span class="material-symbols-outlined">picture_as_pdf</span>
+                                GENERATE PDF
+                            </button>
+<p class="text-center text-[10px] text-on-surface-variant mt-3 font-['Space_Grotesk'] tracking-widest uppercase">Verified Watermark Included</p>
+</div>
+</div>
+</div>
+<!-- CV Content Options -->
+<div class="bg-surface-container p-6 rounded-xl space-y-4">
+<h4 class="font-['Space_Grotesk'] text-xs font-bold tracking-[0.2em] uppercase text-on-surface-variant">Include Sections</h4>
+<div class="space-y-3">
+<label class="flex items-center justify-between cursor-pointer group">
+<span class="text-sm font-medium">Daily Log Summaries</span>
+<div class="w-10 h-5 bg-secondary/20 rounded-full relative transition-colors group-hover:bg-secondary/30">
+<div class="absolute right-1 top-1 w-3 h-3 bg-secondary rounded-full"></div>
+</div>
+</label>
+<label class="flex items-center justify-between cursor-pointer group">
+<span class="text-sm font-medium">GitHub Contributions</span>
+<div class="w-10 h-5 bg-secondary/20 rounded-full relative transition-colors group-hover:bg-secondary/30">
+<div class="absolute right-1 top-1 w-3 h-3 bg-secondary rounded-full"></div>
+</div>
+</label>
+<label class="flex items-center justify-between cursor-pointer group">
+<span class="text-sm font-medium">Technical Tech Stack</span>
+<div class="w-10 h-5 bg-secondary/20 rounded-full relative transition-colors group-hover:bg-secondary/30">
+<div class="absolute right-1 top-1 w-3 h-3 bg-secondary rounded-full"></div>
+</div>
+</label>
+<label class="flex items-center justify-between cursor-pointer group">
+<span class="text-sm font-medium">Public Profile QR</span>
+<div class="w-10 h-5 bg-secondary/20 rounded-full relative transition-colors group-hover:bg-secondary/30">
+<div class="absolute right-1 top-1 w-3 h-3 bg-secondary rounded-full"></div>
+</div>
+</label>
+</div>
+</div>
+<!-- Info Card -->
+<div class="bg-tertiary-container/10 p-4 rounded-xl border border-tertiary/20">
+<div class="flex gap-3">
+<span class="material-symbols-outlined text-tertiary">info</span>
+<div>
+<p class="text-xs font-bold text-tertiary uppercase tracking-wider mb-1">Elite Status</p>
+<p class="text-xs text-on-surface-variant leading-relaxed">Generated CVs with 90+ days of proof of work have a 3.4x higher response rate from recruiters.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="w-full py-12 bg-[#0b0e14] dark:bg-[#0b0e14] border-t border-[#424654]/15">
+<div class="max-w-7xl mx-auto px-8 flex flex-col md:flex-row justify-between items-center gap-6">
+<div class="font-['Space_Grotesk'] font-bold text-[#e1e2eb]">Proofly Ledger</div>
+<div class="flex gap-8">
+<a class="font-['Inter'] text-sm text-[#9497a1] hover:text-[#e1e2eb] underline decoration-[#b2c5ff]" href="#">Docs</a>
+<a class="font-['Inter'] text-sm text-[#9497a1] hover:text-[#e1e2eb] underline decoration-[#b2c5ff]" href="#">Support</a>
+<a class="font-['Inter'] text-sm text-[#9497a1] hover:text-[#e1e2eb] underline decoration-[#b2c5ff]" href="#">Privacy</a>
+<a class="font-['Inter'] text-sm text-[#9497a1] hover:text-[#e1e2eb] underline decoration-[#b2c5ff]" href="#">GitHub Status</a>
+</div>
+<div class="font-['Inter'] text-sm text-[#9497a1]">© 2024 Proofly Ledger</div>
+</div>
+</footer>
+</body></html>
