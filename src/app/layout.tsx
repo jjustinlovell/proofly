@@ -17,7 +17,7 @@ const jetbrainsMono = JetBrains_Mono({
 export const metadata: Metadata = {
   title: "Proofly — Bridge the Trust Gap. Prove Your Code.",
   description:
-    "Proofly automates the verification of your daily technical output, transforming raw commits into an immutable ledger of professional achievement.",
+    "Proofly automates the verification of your daily technical output, transforming raw commits into an immutable record of professional achievement.",
   keywords: [
     "developer portfolio",
     "proof of work",
@@ -28,8 +28,11 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Proofly — Bridge the Trust Gap. Prove Your Code.",
     description:
-      "Proofly automates the verification of your daily technical output, transforming raw commits into an immutable ledger of professional achievement.",
+      "Proofly automates the verification of your daily technical output, transforming raw commits into an immutable record of professional achievement.",
     type: "website",
+  },
+  icons: {
+    icon: '/logo.png',
   },
 };
 

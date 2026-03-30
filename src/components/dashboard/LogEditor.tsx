@@ -40,7 +40,7 @@ export default function LogEditor() {
         <textarea
           value={content}
           onChange={(e) => setContent(e.target.value)}
-          placeholder={`### What did I do today?\n\n- Implemented the new Obsidian Ledger auth flow\n- Fixed race condition in sync worker\n- Refactored typography tokens...`}
+          placeholder={`### What did I do today?\n\n- Implemented the new Obsidian auth flow\n- Fixed race condition in sync worker\n- Refactored typography tokens...`}
           disabled={isSubmitting}
         />
       </div>

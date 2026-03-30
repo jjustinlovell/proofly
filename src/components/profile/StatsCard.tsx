@@ -36,9 +36,9 @@ export default function StatsCard({ currentStreak, verifiedStreak, totalLogs, ve
           </svg>
         </div>
 
-        <h3 className="text-lg font-bold mb-2">Verified Ledger</h3>
+        <h3 className="text-lg font-bold mb-2">Verified Proof</h3>
         <p className="text-sm text-[var(--text-secondary)] mb-4">
-          This profile is cryptographically linked to verified work history on Proofly Ledger.
+          This profile is linked to verified work history on Proofly.
         </p>
 
         <div className="space-y-2 text-sm">

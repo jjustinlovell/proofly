@@ -17,11 +17,7 @@ export default async function LandingPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-14">
             <Link href="/" className="flex items-center gap-2 text-[var(--text-primary)] font-bold text-lg tracking-tight hover:text-[var(--text-primary)]">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M12 2L2 7l10 5 10-5-10-5z" />
-                <path d="M2 17l10 5 10-5" />
-                <path d="M2 12l10 5 10-5" />
-              </svg>
+              <img src="/logo.png" alt="Proofly Logo" className="w-6 h-6 rounded-md object-contain" />
               Proofly
             </Link>
             <div className="hidden md:flex items-center gap-6">
@@ -52,13 +48,13 @@ export default async function LandingPage() {
               </h1>
 
               <p className="text-lg text-[var(--text-secondary)] max-w-lg mb-10 leading-relaxed">
-                Proofly automates the verification of your daily technical output, transforming raw commits into an immutable ledger of professional achievement.
+                Proofly automates the verification of your daily technical output, transforming raw commits into an immutable record of professional achievement.
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4">
                 <LoginButton />
                 <Link href="#features" className="btn btn-secondary btn-lg">
-                  View Public Ledger
+                  View Public Profiles
                 </Link>
               </div>
             </div>
@@ -127,7 +123,7 @@ export default async function LandingPage() {
               </div>
               <h3 className="text-lg font-bold mb-3">Daily Proof of Work</h3>
               <p className="text-sm leading-relaxed">
-                Every meaningful contribution is cryptographically hashed and logged. Build a transparent history of your coding evolution that goes beyond simple green squares.
+                Every meaningful contribution is hashed and logged. Build a transparent history of your coding evolution that goes beyond simple green squares.
               </p>
             </div>
 
@@ -177,21 +173,6 @@ export default async function LandingPage() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t border-[var(--border-primary)] py-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <span className="font-bold text-sm">Proofly Ledger</span>
-          </div>
-          <p className="text-xs text-[var(--text-tertiary)]">© {new Date().getFullYear()} Proofly Ledger</p>
-          <div className="flex items-center gap-6">
-            <a href="#" className="text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)]">Docs</a>
-            <a href="#" className="text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)]">Support</a>
-            <a href="#" className="text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)]">Privacy</a>
-            <a href="https://github.com" className="text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)]">GitHub Status</a>
-          </div>
-        </div>
-      </footer>
     </div>
   )
 }

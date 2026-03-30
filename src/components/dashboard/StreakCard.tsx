@@ -14,8 +14,7 @@ export default function StreakCard({ currentStreak, verifiedStreak, bestStreak }
   return (
     <div className="space-y-4">
       {/* Verified Proof Card */}
-      <div className="card-static p-5 relative overflow-hidden">
-        {/* Background decoration */}
+      {/* <div className="card-static p-5 relative overflow-hidden">
         <div className="absolute top-3 right-3 opacity-10">
           <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="var(--accent-green)" strokeWidth="1.5">
             <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
@@ -33,17 +32,17 @@ export default function StreakCard({ currentStreak, verifiedStreak, bestStreak }
 
         <h3 className="text-xl font-bold mb-2">Verified Proof</h3>
         <p className="text-sm text-[var(--text-secondary)] mb-4">
-          Your work logs are currently being anchored to the Proofly Ledger every 6 hours via GitHub Actions.
+          Your work logs are currently being anchored to Proofly every 6 hours via GitHub Actions.
         </p>
 
         <a href="#" className="text-sm font-semibold text-[var(--text-primary)] hover:text-[var(--accent-green)] transition-colors flex items-center gap-1">
-          View Ledger Explorer
+          View Proofs
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <line x1="5" y1="12" x2="19" y2="12" />
             <polyline points="12 5 19 12 12 19" />
           </svg>
         </a>
-      </div>
+      </div> */}
 
       {/* Next Milestone Card */}
       <div className="card-static p-5">

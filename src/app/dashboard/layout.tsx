@@ -2,6 +2,7 @@ import Navbar from '@/components/Navbar'
 import Sidebar from '@/components/dashboard/Sidebar'
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
+import { fetchGitHubContributions, calculateGitHubStreak } from '@/lib/github'
 
 export default async function DashboardLayout({
   children,
@@ -16,16 +17,29 @@ export default async function DashboardLayout({
   // Fetch profile for sidebar data
   const { data: profile } = await supabase
     .from('profiles')
-    .select('current_streak, verified_streak, github_access_token')
+    .select('current_streak, verified_streak, github_access_token, username')
     .eq('id', user.id)
     .single()
 
+  // Get GitHub-based streak for sidebar
+  let githubStreak = 0
+  if (profile?.github_access_token && profile?.username) {
+    const contributions = await fetchGitHubContributions(
+      profile.github_access_token,
+      profile.username
+    )
+    const streakData = calculateGitHubStreak(contributions)
+    githubStreak = streakData.current
+  }
+
+  const currentStreak = githubStreak || profile?.current_streak || 0
+
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col h-screen overflow-hidden">
       <Navbar />
       <div className="flex flex-1 overflow-hidden">
         <Sidebar
-          currentStreak={profile?.current_streak ?? 0}
+          currentStreak={currentStreak}
           verifiedStreak={profile?.verified_streak ?? 0}
           githubConnected={!!profile?.github_access_token}
         />
@@ -34,19 +48,6 @@ export default async function DashboardLayout({
         </main>
       </div>
 
-      {/* Footer */}
-      <footer className="border-t border-[var(--border-primary)] py-4 bg-[var(--bg-secondary)]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
-          <span className="text-xs font-bold text-[var(--text-secondary)]">Proofly Ledger</span>
-          <div className="flex items-center gap-6">
-            <a href="#" className="text-xs text-[var(--text-tertiary)] hover:text-[var(--text-secondary)]">Docs</a>
-            <a href="#" className="text-xs text-[var(--text-tertiary)] hover:text-[var(--text-secondary)]">Support</a>
-            <a href="#" className="text-xs text-[var(--text-tertiary)] hover:text-[var(--text-secondary)]">Privacy</a>
-            <a href="#" className="text-xs text-[var(--text-tertiary)] hover:text-[var(--text-secondary)]">GitHub Status</a>
-          </div>
-          <span className="text-xs text-[var(--text-tertiary)]">© {new Date().getFullYear()} Proofly Ledger</span>
-        </div>
-      </footer>
     </div>
   )
 }
