@@ -28,7 +28,7 @@ export default function StatsCard({ currentStreak, verifiedStreak, totalLogs, ve
       </div>
 
       {/* Verified Ledger */}
-      <div className="card-static p-5 relative overflow-hidden">
+      {/* <div className="card-static p-5 relative overflow-hidden">
         <div className="absolute top-3 right-3 opacity-10">
           <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--accent-green)" strokeWidth="1.5">
             <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
@@ -61,7 +61,7 @@ export default function StatsCard({ currentStreak, verifiedStreak, totalLogs, ve
         <button className="btn btn-secondary w-full mt-4 font-mono tracking-wider text-xs">
           Download Verified CV
         </button>
-      </div>
+      </div> */}
 
       {/* Ecosystem Links */}
       <div className="card-static p-5">

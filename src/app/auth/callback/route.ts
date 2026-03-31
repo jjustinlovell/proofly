@@ -10,9 +10,9 @@ export async function GET(request: Request) {
     const supabase = await createClient()
 
     // Exchange the auth code for a session
-    const { data: { user }, error } = await supabase.auth.exchangeCodeForSession(code)
+    const { data: { user, session }, error } = await supabase.auth.exchangeCodeForSession(code)
 
-    if (!error && user) {
+    if (!error && user && session) {
       // Check if profile exists
       const { data: existingProfile } = await supabase
         .from('profiles')
@@ -27,9 +27,8 @@ export async function GET(request: Request) {
         const fullName = meta?.full_name || meta?.name || ''
         const avatarUrl = meta?.avatar_url || ''
 
-        // Get the GitHub access token from the session
-        const { data: { session } } = await supabase.auth.getSession()
-        const githubAccessToken = session?.provider_token || ''
+        // Get the GitHub access token from the session directly
+        const githubAccessToken = session.provider_token || ''
 
         await supabase.from('profiles').insert({
           id: user.id,
@@ -43,8 +42,7 @@ export async function GET(request: Request) {
         })
       } else {
         // Update the GitHub access token on every login (it may have changed)
-        const { data: { session } } = await supabase.auth.getSession()
-        if (session?.provider_token) {
+        if (session.provider_token) {
           await supabase
             .from('profiles')
             .update({ github_access_token: session.provider_token })

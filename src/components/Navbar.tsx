@@ -115,13 +115,6 @@ export default function Navbar() {
                           <p className="text-xs text-[var(--text-tertiary)]">@{user.username}</p>
                         </div>
                         <Link
-                          href="/dashboard"
-                          className="flex items-center gap-2 px-3 py-2 text-sm text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)] rounded-md"
-                          onClick={() => setMenuOpen(false)}
-                        >
-                          Dashboard
-                        </Link>
-                        <Link
                           href={user.username ? `/${user.username}` : '#'}
                           className="flex items-center gap-2 px-3 py-2 text-sm text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)] rounded-md"
                           onClick={() => setMenuOpen(false)}

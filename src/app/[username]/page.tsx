@@ -80,6 +80,14 @@ export default async function PublicProfilePage(
     .slice(0, 4)
   const totalRepoActivity = topRepos.reduce((sum, [, count]) => sum + count, 0) || 1
 
+  // Compute if user has logged today
+  const todayStr = new Date().toISOString().split('T')[0]
+  const hasManualLogToday = allLogs.some(log => log.created_at.startsWith(todayStr))
+  const hasGithubLogToday = githubData?.weeks.some(w => 
+    w.contributionDays.some(d => d.date === todayStr && d.contributionCount > 0)
+  ) || false
+  const hasLoggedToday = hasManualLogToday || hasGithubLogToday
+
   return (
     <div className="flex flex-col min-h-screen">
       <Navbar />
@@ -109,9 +117,17 @@ export default async function PublicProfilePage(
               </div>
 
               <div>
-                <h1 className="text-2xl font-bold">{profile.username}</h1>
+                <div className="flex items-center gap-3">
+                  <h1 className="text-2xl font-bold">{profile.username}</h1>
+                  {currentStreak > 0 && (
+                    <div className={`flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-sm font-bold border ${hasLoggedToday ? 'bg-orange-500/10 text-orange-500 border-orange-500/20' : 'bg-[var(--bg-elevated)] text-[var(--text-tertiary)] border-[var(--border-primary)] grayscale opacity-70'}`} title={hasLoggedToday ? "Streak is active today!" : "Log something today to keep your streak!"}>
+                      <span>🔥</span>
+                      <span>{currentStreak}</span>
+                    </div>
+                  )}
+                </div>
                 {profile.full_name && (
-                  <p className="text-sm text-[var(--text-secondary)] font-mono uppercase tracking-wider">
+                  <p className="text-sm text-[var(--text-secondary)] font-mono uppercase tracking-wider mt-1">
                     {profile.full_name}
                   </p>
                 )}
