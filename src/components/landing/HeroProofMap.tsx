@@ -1,8 +1,8 @@
 'use client'
 
 export default function HeroProofMap() {
-  // Generate a deterministic heatmap pattern for the hero
-  const weeks = 12
+  // Expand weeks to go fully to the right
+  const weeks = 24
   const days = 7
   const levels = [0, 1, 2, 3, 4]
 
@@ -19,6 +19,9 @@ export default function HeroProofMap() {
     return levels[level]
   })
 
+  // The very last cell in the matrix (bottom right)
+  const lastCellIndex = cells.length - 1;
+
   const heatmapColors = [
     'var(--heatmap-0)',
     'var(--heatmap-1)',
@@ -28,15 +31,21 @@ export default function HeroProofMap() {
   ]
 
   return (
-    <div className="heatmap-grid" style={{ gridTemplateColumns: `repeat(${weeks}, 1fr)` }}>
-      {cells.map((level, i) => (
-        <div
-          key={i}
-          className="heatmap-cell"
-          style={{ backgroundColor: heatmapColors[level] }}
-          title={`${level} contributions`}
-        />
-      ))}
+    <div className="heatmap-grid w-full justify-between flex-1" style={{ gridTemplateColumns: `repeat(${weeks}, minmax(0, 1fr))` }}>
+      {cells.map((level, i) => {
+        const isToday = i === lastCellIndex;
+        return (
+          <div
+            key={i}
+            className={`heatmap-cell rounded-sm ${isToday ? 'animate-pulse' : ''}`}
+            style={{ 
+              backgroundColor: isToday ? 'var(--accent-green)' : heatmapColors[level],
+              ...(isToday ? { boxShadow: '0 0 12px var(--accent-green)', zIndex: 10, position: 'relative' } : {})
+            }}
+            title={isToday ? 'Today: Verified' : `${level} contributions`}
+          />
+        )
+      })}
     </div>
   )
 }

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import CVPreview from '@/components/cv/CVPreview'
 
@@ -25,14 +25,21 @@ interface Log {
   created_at: string
 }
 
-export default function CVGeneratorClient({ profile, initialLogs }: { profile: Profile; initialLogs: Log[] }) {
+export default function CVGeneratorClient({ 
+  profile, 
+  initialLogs,
+  topLanguages
+}: { 
+  profile: Profile; 
+  initialLogs: Log[];
+  topLanguages: { language: string; size: number }[];
+}) {
   const [dateRange, setDateRange] = useState<'30' | '90' | 'all'>('90')
   const [theme, setTheme] = useState<'light' | 'dark'>('dark')
   const [sections, setSections] = useState({
     dailyLogs: true,
     githubContributions: true,
     techStack: true,
-    publicProfileQR: true,
   })
   const printRef = useRef<HTMLDivElement>(null)
 
@@ -45,26 +52,53 @@ export default function CVGeneratorClient({ profile, initialLogs }: { profile: P
     return new Date(log.created_at) >= cutoff
   })
 
+  useEffect(() => {
+    // Add print styles dynamically
+    const style = document.createElement('style')
+    style.innerHTML = `
+      @media print {
+        body * {
+          visibility: hidden;
+        }
+        #cv-preview, #cv-preview * {
+          visibility: visible;
+        }
+        #cv-preview {
+          position: absolute;
+          left: 0;
+          top: 0;
+          width: 100%;
+          margin: 0;
+          padding: 0;
+        }
+      }
+    `
+    document.head.appendChild(style)
+    return () => {
+      document.head.removeChild(style)
+    }
+  }, [])
+
   const handlePrint = () => {
     window.print()
   }
 
   return (
-    <div className="p-6 lg:p-8 max-w-6xl">
+    <div className="p-6 lg:p-8 w-full max-w-none">
       {/* Header */}
       <div className="flex items-center gap-3 mb-8">
         <span className="badge badge-verified">Live Preview</span>
-        <span className="text-sm text-[var(--text-secondary)]">Last updated 2 mins ago</span>
       </div>
 
       <div className="grid lg:grid-cols-[1fr_300px] gap-6">
         {/* CV Preview */}
-        <div ref={printRef}>
+        <div ref={printRef} id="cv-preview">
           <CVPreview
             profile={profile}
             logs={filteredLogs}
             theme={theme}
             sections={sections}
+            topLanguages={topLanguages}
           />
         </div>
 
@@ -150,7 +184,6 @@ export default function CVGeneratorClient({ profile, initialLogs }: { profile: P
                   dailyLogs: 'Daily Log Summaries',
                   githubContributions: 'GitHub Contributions',
                   techStack: 'Technical Tech Stack',
-                  publicProfileQR: 'Public Profile QR',
                 }
                 return (
                   <div key={key} className="flex items-center justify-between">

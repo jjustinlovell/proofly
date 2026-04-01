@@ -25,16 +25,19 @@ interface CVPreviewProps {
     dailyLogs: boolean
     githubContributions: boolean
     techStack: boolean
-    publicProfileQR: boolean
   }
+  topLanguages: { language: string; size: number }[]
 }
 
-export default function CVPreview({ profile, logs, theme, sections }: CVPreviewProps) {
+export default function CVPreview({ profile, logs, theme, sections, topLanguages }: CVPreviewProps) {
   const isLight = theme === 'light'
+
+  // Only include verified GitHub contributions to maintain CV integrity
+  const githubLogsOnly = logs.filter(log => !!log.github_data?.repo)
 
   // Group logs by time period
   const groupedLogs = new Map<string, Log[]>()
-  logs.forEach(log => {
+  githubLogsOnly.forEach(log => {
     const date = new Date(log.created_at)
     const quarter = `Q${Math.ceil((date.getMonth() + 1) / 3)} ${date.getFullYear()}`
     const existing = groupedLogs.get(quarter) || []
@@ -42,18 +45,7 @@ export default function CVPreview({ profile, logs, theme, sections }: CVPreviewP
     groupedLogs.set(quarter, existing)
   })
 
-  // Extract top repos
-  const repoCounter = new Map<string, number>()
-  logs.forEach(log => {
-    if (log.github_data?.repo) {
-      const repo = log.github_data.repo.split('/').pop() || log.github_data.repo
-      repoCounter.set(repo, (repoCounter.get(repo) || 0) + 1)
-    }
-  })
-  const topRepos = Array.from(repoCounter.entries())
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 3)
-  const totalRepoActivity = topRepos.reduce((sum, [, count]) => sum + count, 0) || 1
+  const totalLangSize = topLanguages.reduce((sum, lang) => sum + lang.size, 0) || 1
 
   const bgColor = isLight ? 'white' : 'var(--bg-secondary)'
   const textColor = isLight ? '#1a1a2e' : 'var(--text-primary)'
@@ -69,6 +61,8 @@ export default function CVPreview({ profile, logs, theme, sections }: CVPreviewP
         color: textColor,
         border: `1px solid ${borderColor}`,
         boxShadow: isLight ? '0 4px 24px rgba(0,0,0,0.1)' : 'var(--shadow-lg)',
+        WebkitPrintColorAdjust: 'exact',
+        printColorAdjust: 'exact'
       }}
     >
       {/* CV Header */}
@@ -78,22 +72,10 @@ export default function CVPreview({ profile, logs, theme, sections }: CVPreviewP
             <h1 className="text-3xl font-bold" style={{ color: textColor }}>
               {profile.full_name || profile.username}
             </h1>
-            <p className="text-lg mt-1" style={{ color: accentColor }}>
-              Full-stack Engineer & Technical Architect
-            </p>
           </div>
-          {sections.publicProfileQR && (
-            <div className="w-16 h-16 rounded-md flex items-center justify-center" style={{ backgroundColor: isLight ? '#f3f4f6' : 'var(--bg-elevated)' }}>
-              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke={mutedColor} strokeWidth="1">
-                <rect x="2" y="2" width="8" height="8" rx="1" />
-                <rect x="14" y="2" width="8" height="8" rx="1" />
-                <rect x="2" y="14" width="8" height="8" rx="1" />
-                <rect x="14" y="14" width="4" height="4" rx="0.5" />
-                <rect x="18" y="18" width="4" height="4" rx="0.5" />
-                <rect x="14" y="18" width="4" height="4" rx="0.5" />
-              </svg>
-            </div>
-          )}
+          <div className="w-16 h-16 rounded-md flex items-center justify-center overflow-hidden" style={{ backgroundColor: isLight ? '#f3f4f6' : 'var(--bg-elevated)', border: `1px solid ${borderColor}` }}>
+            <img src="/logo.png" alt="Proofly Mascot" className="w-10 h-10 object-contain" />
+          </div>
         </div>
       </div>
 
@@ -102,9 +84,12 @@ export default function CVPreview({ profile, logs, theme, sections }: CVPreviewP
         <div className="flex-1 p-8">
           {sections.dailyLogs && (
             <div>
-              <h2 className="font-bold text-sm uppercase tracking-widest mb-6" style={{ color: mutedColor }}>
+              <h2 className="font-bold text-sm uppercase tracking-widest mb-2" style={{ color: mutedColor }}>
                 Verified Proof of Work
               </h2>
+              <p className="text-xs mb-8 max-w-lg font-mono tracking-tight" style={{ color: mutedColor }}>
+                * Exclusively verified GitHub contributions; manual unverified entries are omitted to maintain absolute integrity.
+              </p>
 
               {Array.from(groupedLogs.entries()).slice(0, 3).map(([quarter, qLogs]) => (
                 <div key={quarter} className="mb-8">
@@ -115,23 +100,32 @@ export default function CVPreview({ profile, logs, theme, sections }: CVPreviewP
 
                   {/* Group title from first log */}
                   <h3 className="text-lg font-bold mb-3" style={{ color: textColor }}>
-                    {qLogs[0]?.content.split('\n')[0]?.replace(/^#+\s*/, '').replace(/^-\s*/, '').trim() || 'Development Work'}
+                    {qLogs[0]?.github_data?.repo?.split('/').pop() || 'Development Work'}
                   </h3>
 
-                  <ul className="space-y-2 ml-4">
-                    {qLogs.slice(0, 4).map(log => {
-                      const lines = log.content.split('\n').filter(l => l.trim())
-                      const bullets = lines.slice(0, 2)
-                      return bullets.map((line, i) => (
-                        <li key={`${log.id}-${i}`} className="text-sm flex items-start gap-2">
-                          <span style={{ color: mutedColor }}>•</span>
-                          <span style={{ color: mutedColor }}>
-                            {line.replace(/^[-*]\s*/, '')}
-                          </span>
-                        </li>
-                      ))
+                  <div className="space-y-3 ml-2">
+                    {qLogs.slice(0, 10).map(log => {
+                      const commitMsg = log.github_data!.commit_message 
+                      
+                      return (
+                        <div key={log.id} className="flex flex-col gap-1 pl-3 border-l-2" style={{ borderColor: isLight ? '#e5e7eb' : 'var(--border-primary)' }}>
+                          <div className="flex items-center gap-2">
+                            {log.github_data?.commit_sha && (
+                              <span style={{ color: mutedColor }} className="font-mono text-xs">
+                                {log.github_data.commit_sha.slice(0, 7)}
+                              </span>
+                            )}
+                            <span className="font-mono text-[10px] uppercase font-bold tracking-widest border px-1.5 py-0.5 rounded" style={{ color: accentColor, borderColor: accentColor }}>
+                              {log.github_data!.repo!.split('/').pop()}
+                            </span>
+                          </div>
+                          <p className="text-sm" style={{ color: textColor }}>
+                            {commitMsg}
+                          </p>
+                        </div>
+                      )
                     })}
-                  </ul>
+                  </div>
                 </div>
               ))}
             </div>
@@ -140,25 +134,25 @@ export default function CVPreview({ profile, logs, theme, sections }: CVPreviewP
 
         {/* Right Sidebar */}
         <div className="w-56 p-6 space-y-6" style={{ borderLeft: `1px solid ${borderColor}` }}>
-          {sections.techStack && topRepos.length > 0 && (
+          {sections.techStack && topLanguages.length > 0 && (
             <div>
               <h4 className="font-bold text-xs uppercase tracking-widest mb-4" style={{ color: mutedColor }}>
                 Top Languages
               </h4>
               <div className="space-y-3">
-                {topRepos.map(([repo, count], i) => {
-                  const pctg = Math.round((count / totalRepoActivity) * 100)
-                  const colors = [accentColor, 'var(--accent-blue)', 'var(--accent-orange)']
+                {topLanguages.map((lang, i) => {
+                  const pctg = Math.round((lang.size / totalLangSize) * 100)
+                  const colors = [accentColor, 'var(--accent-blue)', 'var(--accent-orange)', '#8b5cf6', '#ec4899']
                   return (
                     <div key={i}>
                       <div className="flex justify-between text-sm mb-1">
-                        <span>{repo}</span>
-                        <span style={{ color: accentColor }}>{pctg}%</span>
+                        <span className="font-bold">{lang.language}</span>
+                        <span style={{ color: accentColor }} className="font-mono text-xs">{pctg}%</span>
                       </div>
-                      <div className="h-1.5 rounded-full" style={{ backgroundColor: isLight ? '#e5e7eb' : 'var(--bg-elevated)' }}>
+                      <div className="h-1.5 rounded-full overflow-hidden" style={{ backgroundColor: isLight ? '#e5e7eb' : 'var(--bg-elevated)' }}>
                         <div
                           className="h-full rounded-full"
-                          style={{ width: `${pctg}%`, backgroundColor: colors[i] || colors[2] }}
+                          style={{ width: `${Math.max(pctg, 2)}%`, backgroundColor: colors[i] || colors[2] }}
                         />
                       </div>
                     </div>
@@ -181,9 +175,12 @@ export default function CVPreview({ profile, logs, theme, sections }: CVPreviewP
                   </svg>
                   <span className="text-xs font-bold" style={{ color: accentColor }}>Proofly Verified</span>
                 </div>
-                <p className="text-[10px] font-mono" style={{ color: mutedColor }}>
-                  Ledger ID: {profile.username?.slice(0, 4)}-{Math.random().toString(36).slice(2, 6)}-{Math.random().toString(36).slice(2, 6)}
-                </p>
+                <div className="mt-1">
+                  <p className="text-[10px] font-bold uppercase tracking-wider" style={{ color: mutedColor }}>GitHub ID</p>
+                  <p className="text-[11px] font-mono mt-0.5" style={{ color: textColor }}>
+                    @{profile.username}
+                  </p>
+                </div>
               </div>
             </div>
           )}

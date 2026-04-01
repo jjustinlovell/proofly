@@ -64,7 +64,7 @@ export default function Navbar() {
                 key={link.href}
                 href={link.href}
                 className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
-                  pathname === link.href || pathname.startsWith(link.href + '/')
+                  pathname === link.href || (link.href !== '/dashboard' && pathname.startsWith(link.href + '/'))
                     ? 'text-[var(--text-primary)] bg-[var(--bg-elevated)]'
                     : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
                 }`}

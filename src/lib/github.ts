@@ -203,3 +203,44 @@ export function calculateGitHubStreak(
 
   return { current, best }
 }
+
+/**
+ * Fetch top programming languages based on repository size. 
+ */
+export async function fetchGitHubTopLanguages(
+  accessToken: string,
+  username: string
+): Promise<{ language: string; size: number }[]> {
+  const headers: Record<string, string> = {
+    Accept: 'application/vnd.github.v3+json',
+  }
+  if (accessToken) {
+    headers.Authorization = `Bearer ${accessToken}`
+  }
+
+  try {
+    const reposRes = await fetch(
+      `https://api.github.com/users/${username}/repos?per_page=100`,
+      { headers, cache: 'no-store' }
+    )
+    if (!reposRes.ok) return []
+    const repos = await reposRes.json()
+
+    const langMap = new Map<string, number>()
+    repos.forEach((repo: any) => {
+      // Ignore forks and empty languages
+      if (repo.language && !repo.fork) {
+        langMap.set(repo.language, (langMap.get(repo.language) || 0) + (repo.size || 1))
+      }
+    })
+
+    const sorted = Array.from(langMap.entries())
+      .map(([language, size]) => ({ language, size }))
+      .sort((a, b) => b.size - a.size)
+
+    return sorted.slice(0, 5) // top 5
+  } catch {
+    return []
+  }
+}
+

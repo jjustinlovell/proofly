@@ -20,10 +20,26 @@ export default function StatsCard({ currentStreak, verifiedStreak, totalLogs, ve
           <p className="text-3xl font-bold">{currentStreak}</p>
           <p className="text-xs text-[var(--text-tertiary)] uppercase font-mono">Days</p>
         </div>
-        <div className="card-static p-4 text-center">
-          <p className="section-label mb-1">Trust Score</p>
+        <div className="card-static p-4 text-center relative group cursor-help transition-colors hover:border-[var(--accent-green)]/30">
+          <p className="section-label mb-1 flex items-center justify-center gap-1">
+            Trust Score
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[var(--text-tertiary)]">
+              <circle cx="12" cy="12" r="10" />
+              <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+              <line x1="12" y1="17" x2="12.01" y2="17" />
+            </svg>
+          </p>
           <p className="text-3xl font-bold text-[var(--accent-green)]">{trustScore}</p>
           <p className="text-xs text-[var(--text-tertiary)] uppercase font-mono">Rating</p>
+
+          {/* Tooltip */}
+          <div className="absolute top-full left-1/2 -translate-x-1/2 mt-3 w-56 p-3 bg-[var(--bg-elevated)] border border-[var(--border-primary)] rounded-lg shadow-2xl opacity-0 translate-y-2 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-200 z-50">
+            <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-[var(--bg-elevated)] border-t border-l border-[var(--border-primary)] rotate-45" />
+            <p className="relative text-xs text-[var(--text-secondary)] text-left leading-relaxed z-10">
+              <strong className="text-[var(--text-primary)] block mb-1">Trust Score</strong>
+              Percentage of logs that are directly corroborated by verified GitHub commits.
+            </p>
+          </div>
         </div>
       </div>
 

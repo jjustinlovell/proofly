@@ -3,7 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import HeroProofMap from '@/components/landing/HeroProofMap'
 import LoginButton from '@/components/landing/LoginButton'
-
+import InteractiveBackground from '@/components/landing/InteractiveBackground'
 export default async function LandingPage() {
   // If already authenticated, redirect to dashboard
   const supabase = await createClient()
@@ -29,78 +29,77 @@ export default async function LandingPage() {
       </nav>
 
       {/* Hero Section */}
-      <section className="flex-1 flex items-center py-20 lg:py-32">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+      <section className="relative flex-1 flex items-center py-20 lg:py-32 overflow-hidden">
+        {/* Background Effects */}
+        <InteractiveBackground />
+
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
             {/* Left — Copy */}
-            <div className="animate-fade-in">
-              {/* System status badge */}
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[var(--bg-secondary)] border border-[var(--border-primary)] mb-8">
-                <span className="status-dot status-online"></span>
-                <span className="text-xs font-mono font-medium text-[var(--text-secondary)] tracking-wider uppercase">System Online: v2.4.0</span>
-              </div>
-
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-[1.1] tracking-tight mb-6">
+            <div className="animate-fade-in relative z-10">
+              <h1 className="text-5xl sm:text-6xl lg:text-7xl font-extrabold leading-[1.05] tracking-tight mb-6 relative">
                 Bridge the{' '}
-                <span className="text-gradient">Trust Gap</span>.
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[var(--accent-green)] to-emerald-400">Trust Gap</span>.
                 <br />
                 Prove Your Code.
               </h1>
 
-              <p className="text-lg text-[var(--text-secondary)] max-w-lg mb-10 leading-relaxed">
+              <p className="text-lg sm:text-xl text-[var(--text-secondary)] max-w-lg mb-10 leading-relaxed">
                 Proofly automates the verification of your daily technical output, transforming raw commits into an immutable record of professional achievement.
               </p>
 
-              <div className="flex flex-col sm:flex-row gap-4">
+              <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
                 <LoginButton />
-                <Link href="#features" className="btn btn-secondary btn-lg">
-                  View Public Profiles
-                </Link>
               </div>
             </div>
 
             {/* Right — Proof Map + Commit Card */}
-            <div className="space-y-6 animate-slide-in-right" style={{ animationDelay: '0.2s', opacity: 0 }}>
+            <div className="space-y-6 animate-slide-in-right relative" style={{ animationDelay: '0.2s', opacity: 0 }}>
+              {/* Decorative back-glow */}
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-[120%] bg-[var(--accent-green)]/5 blur-[100px] rounded-full -z-10 pointer-events-none" />
+              
               {/* Proof Map Card */}
-              <div className="card-static p-6">
-                <div className="flex items-center justify-between mb-4">
+              <div className="card-static p-6 border border-[var(--border-primary)] bg-[var(--bg-secondary)]/50 backdrop-blur-xl shadow-2xl relative overflow-hidden group">
+                <div className="absolute inset-0 bg-gradient-to-br from-[var(--accent-green)]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+                <div className="flex items-center justify-between mb-4 relative z-10">
                   <div>
                     <p className="section-label mb-1">Consistency Metric</p>
                     <h3 className="text-xl font-bold">Proof Map</h3>
                   </div>
                   <div className="text-right">
-                    <p className="text-3xl font-bold text-[var(--accent-green)]">365</p>
+                    <p className="text-3xl font-black text-[var(--accent-green)] drop-shadow-[0_0_15px_rgba(var(--accent-green-rgb),0.3)]">365</p>
                     <p className="section-label">Day Streak</p>
                   </div>
                 </div>
-                <HeroProofMap />
+                <div className="relative z-10 flex">
+                  <HeroProofMap />
+                </div>
               </div>
 
               {/* Commit Card */}
-              <div className="card-static p-4">
+              <div className="card-static p-5 border border-[var(--border-primary)] shadow-xl bg-[var(--bg-primary)] transform hover:-translate-y-1 transition-transform duration-300">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-[var(--bg-elevated)] flex items-center justify-center">
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--text-secondary)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-xl bg-[var(--bg-elevated)] border border-[var(--border-primary)] shadow-inner flex items-center justify-center">
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--text-primary)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <polyline points="16 18 22 12 16 6" />
                         <polyline points="8 6 2 12 8 18" />
                       </svg>
                     </div>
                     <div>
-                      <p className="font-semibold text-sm">Refactor Auth Middleware</p>
-                      <p className="text-xs font-mono text-[var(--text-tertiary)]">commit: 7f8a2c1</p>
+                      <p className="font-bold text-[var(--text-primary)]">Refactor Auth Middleware</p>
+                      <p className="text-sm font-mono text-[var(--text-tertiary)] mt-0.5">commit: 7f8a2c1</p>
                     </div>
                   </div>
-                  <div className="flex items-center">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                      <circle cx="12" cy="12" r="10" fill="var(--accent-green)" fillOpacity="0.15" />
-                      <path d="M9 12l2 2 4-4" stroke="var(--accent-green)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  <div className="flex items-center justify-center w-8 h-8 rounded-full bg-[var(--accent-green)]/10">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                      <path d="M20 6L9 17l-5-5" stroke="var(--accent-green)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
                   </div>
                 </div>
-                <div className="flex gap-2 mt-3">
-                  <span className="badge badge-verified">Passed_Tests</span>
-                  <span className="badge badge-blue">Verified_Work</span>
+                <div className="flex gap-2 mt-4">
+                  <span className="badge badge-verified border-[var(--accent-green)]/30 shadow-sm bg-[var(--bg-secondary)]">Passed_Tests</span>
+                  <span className="badge badge-blue border-[var(--accent-blue)]/30 shadow-sm bg-[var(--bg-secondary)]">Verified_Work</span>
                 </div>
               </div>
             </div>
@@ -109,8 +108,16 @@ export default async function LandingPage() {
       </section>
 
       {/* Features Section */}
-      <section id="features" className="py-20 lg:py-28">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section id="features" className="relative py-24 lg:py-32 overflow-hidden bg-[var(--bg-secondary)]/30 border-y border-[var(--border-primary)]/50">
+        {/* Subtle decorative grid */}
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:32px_32px] [mask-image:radial-gradient(ellipse_80%_50%_at_50%_50%,#000_70%,transparent_100%)] pointer-events-none -z-10" />
+        
+        {/* Ambient glows matching feature card colors */}
+        <div className="absolute top-1/2 left-[10%] -translate-y-1/2 w-[400px] h-[400px] bg-[var(--accent-green)]/10 blur-[120px] rounded-full pointer-events-none -z-10" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-[var(--accent-blue)]/10 blur-[120px] rounded-full pointer-events-none -z-10" />
+        <div className="absolute top-1/2 right-[10%] -translate-y-1/2 w-[400px] h-[400px] bg-[var(--accent-purple)]/10 blur-[120px] rounded-full pointer-events-none -z-10" />
+
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-3 gap-6 stagger-children">
             {/* Feature 1 */}
             <div className="card-static p-8">
@@ -161,15 +168,20 @@ export default async function LandingPage() {
       </section>
 
       {/* CTA Section */}
-      <section id="cta" className="py-20 lg:py-28 text-center">
-        <div className="max-w-2xl mx-auto px-4">
-          <h2 className="text-3xl sm:text-4xl font-bold mb-4">
-            Ready to curate your technical legacy?
+      <section id="cta" className="relative py-24 lg:py-32 text-center overflow-hidden border-t border-[var(--border-primary)] bg-[var(--bg-secondary)]/30">
+        {/* Green Aurora from Bottom */}
+        <div className="absolute bottom-0 left-0 right-0 h-[600px] bg-gradient-to-t from-[var(--accent-green)]/20 via-[var(--accent-green)]/5 to-transparent blur-3xl pointer-events-none -z-10" />
+        {/* Decorative CTA Grid */}
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808010_1px,transparent_1px),linear-gradient(to_bottom,#80808010_1px,transparent_1px)] bg-[size:32px_32px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_100%,#000_70%,transparent_100%)] pointer-events-none -z-10" />
+        
+        <div className="relative z-10 max-w-3xl mx-auto px-4">
+          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold mb-6 tracking-tight">
+            Ready to curate your <br className="hidden sm:block" />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[var(--accent-green)] to-emerald-400">technical legacy?</span>
           </h2>
-          <p className="text-lg text-[var(--text-secondary)] mb-10">
-            Join 12,000+ developers documenting their journey from junior to lead.
-          </p>
-          <LoginButton variant="large" />
+          <div className="flex justify-center">
+            <LoginButton variant="large" />
+          </div>
         </div>
       </section>
 
