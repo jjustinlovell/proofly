@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useEffect, useState } from 'react'
+import SearchBar from './SearchBar'
 
 interface UserProfile {
   username: string | null
@@ -56,6 +57,11 @@ export default function Navbar() {
             <img src="/logo.png" alt="Proofly Logo" className="w-6 h-6 rounded-md object-contain" />
             Proofly
           </Link>
+
+          {/* Global Search Bar */}
+          <div className="flex-1 max-w-lg hidden sm:block">
+            <SearchBar />
+          </div>
 
           {/* Desktop Nav Links */}
           <div className="hidden md:flex items-center gap-1">
