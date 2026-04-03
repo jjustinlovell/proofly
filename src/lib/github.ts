@@ -17,10 +17,23 @@ interface GitHubContributionData {
   weeks: ContributionWeek[]
 }
 
+/**
+ * Resolve the best available GitHub token.
+ * Priority: user's OAuth token → server-side GITHUB_PAT env variable.
+ * The PAT fallback ensures we always have 5,000 req/hr instead of 60.
+ */
+function resolveGitHubToken(accessToken?: string): string {
+  if (accessToken) return accessToken
+  return process.env.GITHUB_PAT || ''
+}
+
 export async function fetchGitHubContributions(
   accessToken: string,
   username: string
 ): Promise<GitHubContributionData | null> {
+  const token = resolveGitHubToken(accessToken)
+  if (!token) return null
+
   try {
     const query = `
       query($username: String!) {
@@ -43,7 +56,7 @@ export async function fetchGitHubContributions(
     const response = await fetch('https://api.github.com/graphql', {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${accessToken}`,
+        Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ query, variables: { username } }),
@@ -80,11 +93,12 @@ export async function fetchGitHubEvents(
   accessToken: string,
   username: string
 ): Promise<GitHubCommitEvent[]> {
+  const token = resolveGitHubToken(accessToken)
   const headers: Record<string, string> = {
     Accept: 'application/vnd.github.v3+json',
   }
-  if (accessToken) {
-    headers.Authorization = `Bearer ${accessToken}`
+  if (token) {
+    headers.Authorization = `Bearer ${token}`
   }
 
   try {
@@ -211,11 +225,12 @@ export async function fetchGitHubTopLanguages(
   accessToken: string,
   username: string
 ): Promise<{ language: string; size: number }[]> {
+  const token = resolveGitHubToken(accessToken)
   const headers: Record<string, string> = {
     Accept: 'application/vnd.github.v3+json',
   }
-  if (accessToken) {
-    headers.Authorization = `Bearer ${accessToken}`
+  if (token) {
+    headers.Authorization = `Bearer ${token}`
   }
 
   try {
