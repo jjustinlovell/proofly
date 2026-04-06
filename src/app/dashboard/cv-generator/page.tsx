@@ -12,7 +12,7 @@ export default async function CVGeneratorPage() {
   // Fetch profile
   const { data: profile } = await supabase
     .from('profiles')
-    .select('username, full_name, avatar_url, current_streak, verified_streak, best_streak, github_access_token')
+    .select('username, full_name, avatar_url, current_streak, verified_streak, best_streak, github_access_token, ai_credits')
     .eq('id', user.id)
     .single()
 

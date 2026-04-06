@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, useRef, useEffect, useTransition } from 'react'
+import { useState, useRef, useEffect, useTransition, useCallback } from 'react'
 import CVPreview, { type RepoSummary } from '@/components/cv/CVPreview'
-import { summarizeRepo } from './actions'
+import { summarizeRepo, getAICredits } from './actions'
 
 interface Profile {
   username: string
@@ -11,6 +11,7 @@ interface Profile {
   current_streak: number
   verified_streak: number
   best_streak: number
+  ai_credits: number
 }
 
 interface Log {
@@ -44,8 +45,32 @@ export default function CVGeneratorClient({
   const [selectedRepos, setSelectedRepos] = useState<string[]>([])
   const [repoSummaries, setRepoSummaries] = useState<Record<string, RepoSummary>>({})
   const [summarizingRepo, setSummarizingRepo] = useState<string | null>(null)
+  const [credits, setCredits] = useState(profile.ai_credits ?? 2)
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false)
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false)
+  const [paymentStatus, setPaymentStatus] = useState<'idle' | 'success' | 'failed'>('idle')
   const [isPending, startTransition] = useTransition()
   const printRef = useRef<HTMLDivElement>(null)
+
+  // Check for payment callback in URL
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const payment = params.get('payment')
+    if (payment === 'success') {
+      setPaymentStatus('success')
+      // Refresh credits from server
+      getAICredits().then(result => {
+        setCredits(result.credits)
+      })
+      // Clean URL
+      window.history.replaceState({}, '', window.location.pathname)
+      setTimeout(() => setPaymentStatus('idle'), 5000)
+    } else if (payment === 'failed') {
+      setPaymentStatus('failed')
+      window.history.replaceState({}, '', window.location.pathname)
+      setTimeout(() => setPaymentStatus('idle'), 5000)
+    }
+  }, [])
 
   // Filter logs by date range
   const filteredLogs = initialLogs.filter(log => {
@@ -83,6 +108,11 @@ export default function CVGeneratorClient({
   }
 
   const handleSummarize = async (repo: string) => {
+    if (credits <= 0) {
+      setShowUpgradeModal(true)
+      return
+    }
+
     setSummarizingRepo(repo)
     const commits = getRepoCommits(repo)
     const languages = topLanguages.map(l => l.language)
@@ -95,7 +125,6 @@ export default function CVGeneratorClient({
       })
 
       if (result.success && result.summary) {
-        // Extract tech stack from languages + repo context
         const techStack = topLanguages.slice(0, 3).map(l => l.language)
         
         setRepoSummaries(prev => ({
@@ -107,8 +136,14 @@ export default function CVGeneratorClient({
             commitCount: commits.length,
           }
         }))
+
+        // Update credits from server response
+        if (result.remainingCredits !== undefined) {
+          setCredits(result.remainingCredits)
+        }
+      } else if (result.error === 'NO_CREDITS') {
+        setShowUpgradeModal(true)
       } else {
-        // Show error briefly
         console.error('Summarization failed:', result.error)
       }
       setSummarizingRepo(null)
@@ -118,6 +153,10 @@ export default function CVGeneratorClient({
   const handleSummarizeAll = async () => {
     for (const repo of selectedRepos) {
       if (!repoSummaries[repo]) {
+        if (credits <= 0) {
+          setShowUpgradeModal(true)
+          break
+        }
         await handleSummarize(repo)
       }
     }
@@ -129,42 +168,75 @@ export default function CVGeneratorClient({
     )
   }
 
+  const handleUpgrade = async () => {
+    setIsProcessingPayment(true)
+    try {
+      const res = await fetch('/api/payment/create', { method: 'POST' })
+      const data = await res.json()
+      
+      if (data.invoiceUrl) {
+        // Redirect to Xendit payment page
+        window.location.href = data.invoiceUrl
+      } else {
+        console.error('No invoice URL returned:', data)
+        setIsProcessingPayment(false)
+      }
+    } catch (err) {
+      console.error('Payment error:', err)
+      setIsProcessingPayment(false)
+    }
+  }
+
   useEffect(() => {
-    // Add print styles dynamically
     const style = document.createElement('style')
     style.innerHTML = `
       @media print {
-        body * {
-          visibility: hidden;
-        }
-        #cv-preview, #cv-preview * {
-          visibility: visible;
-        }
-        #cv-preview {
-          position: absolute;
-          left: 0;
-          top: 0;
-          width: 100%;
-          margin: 0;
-          padding: 0;
-        }
+        body * { visibility: hidden; }
+        #cv-preview, #cv-preview * { visibility: visible; }
+        #cv-preview { position: absolute; left: 0; top: 0; width: 100%; margin: 0; padding: 0; }
       }
     `
     document.head.appendChild(style)
-    return () => {
-      document.head.removeChild(style)
-    }
+    return () => { document.head.removeChild(style) }
   }, [])
 
-  const handlePrint = () => {
-    window.print()
-  }
+  const handlePrint = () => { window.print() }
 
   const summarizedCount = selectedRepos.filter(r => repoSummaries[r]).length
   const allSummarized = selectedRepos.length > 0 && summarizedCount === selectedRepos.length
 
   return (
     <div className="p-6 lg:p-8 w-full max-w-none">
+      {/* Payment status toast */}
+      {paymentStatus !== 'idle' && (
+        <div
+          className="fixed top-6 right-6 z-50 px-5 py-3 rounded-lg shadow-xl flex items-center gap-3 animate-in slide-in-from-top-2"
+          style={{
+            backgroundColor: paymentStatus === 'success' ? 'var(--accent-green)' : '#ef4444',
+            color: 'white',
+          }}
+        >
+          {paymentStatus === 'success' ? (
+            <>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M9 12l2 2 4-4" />
+                <circle cx="12" cy="12" r="10" />
+              </svg>
+              <span className="font-bold text-sm">Payment successful! 25 credits added.</span>
+            </>
+          ) : (
+            <>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="10" />
+                <line x1="15" y1="9" x2="9" y2="15" />
+                <line x1="9" y1="9" x2="15" y2="15" />
+              </svg>
+              <span className="font-bold text-sm">Payment failed. Please try again.</span>
+            </>
+          )}
+        </div>
+      )}
+
       {/* Header */}
       <div className="flex items-center gap-3 mb-8">
         <span className="badge badge-verified">Live Preview</span>
@@ -184,12 +256,51 @@ export default function CVGeneratorClient({
           />
         </div>
 
-        {/* Export Settings */}
+        {/* Export Settings Sidebar */}
         <div className="space-y-6">
+          {/* Credits Card */}
+          <div
+            className="p-4 rounded-lg border"
+            style={{
+              background: credits > 0
+                ? 'linear-gradient(135deg, rgba(74, 222, 128, 0.08), rgba(59, 130, 246, 0.08))'
+                : 'linear-gradient(135deg, rgba(239, 68, 68, 0.08), rgba(249, 115, 22, 0.08))',
+              borderColor: credits > 0 ? 'rgba(74, 222, 128, 0.2)' : 'rgba(239, 68, 68, 0.2)',
+            }}
+          >
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-xs font-bold uppercase tracking-widest text-[var(--text-tertiary)]">
+                AI Credits
+              </span>
+              <span
+                className="text-2xl font-bold font-mono"
+                style={{ color: credits > 0 ? 'var(--accent-green)' : '#ef4444' }}
+              >
+                {credits}
+              </span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-xs text-[var(--text-tertiary)]">
+                {credits > 0 ? `${credits} summar${credits === 1 ? 'y' : 'ies'} remaining` : 'No credits left'}
+              </span>
+              {credits <= 2 && (
+                <button
+                  onClick={() => setShowUpgradeModal(true)}
+                  className="text-xs font-bold px-3 py-1 rounded-md transition-all"
+                  style={{
+                    background: 'linear-gradient(135deg, #8b5cf6, #6366f1)',
+                    color: 'white',
+                  }}
+                >
+                  Get Pro
+                </button>
+              )}
+            </div>
+          </div>
+
           {/* Date Range */}
           <div className="card-static p-5">
             <h3 className="text-lg font-bold mb-4">Export Settings</h3>
-
             <div className="space-y-4">
               <div>
                 <p className="section-label mb-2">Date Range</p>
@@ -265,10 +376,7 @@ export default function CVGeneratorClient({
                       border: `1px solid ${isSelected ? 'var(--border-primary)' : 'transparent'}`,
                     }}
                   >
-                    <button
-                      onClick={() => toggleRepo(repo)}
-                      className="flex-shrink-0"
-                    >
+                    <button onClick={() => toggleRepo(repo)} className="flex-shrink-0">
                       <div
                         className="w-4 h-4 rounded border-2 flex items-center justify-center transition-all"
                         style={{
@@ -307,7 +415,6 @@ export default function CVGeneratorClient({
                         {isSummarizing ? (
                           <span className="flex items-center gap-1">
                             <span className="inline-block w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                            Generating...
                           </span>
                         ) : '✨ AI'}
                       </button>
@@ -341,9 +448,7 @@ export default function CVGeneratorClient({
                     Summarizing...
                   </>
                 ) : (
-                  <>
-                    ✨ Summarize All ({selectedRepos.length - summarizedCount} remaining)
-                  </>
+                  <>✨ Summarize All ({selectedRepos.length - summarizedCount} remaining)</>
                 )}
               </button>
             )}
@@ -355,7 +460,7 @@ export default function CVGeneratorClient({
             )}
           </div>
 
-          {/* Generate Button */}
+          {/* Generate PDF Button */}
           <button
             onClick={handlePrint}
             className="btn btn-primary w-full btn-lg font-mono tracking-wider"
@@ -410,6 +515,143 @@ export default function CVGeneratorClient({
           </div>
         </div>
       </div>
+
+      {/* Upgrade Modal */}
+      {showUpgradeModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ backgroundColor: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(4px)' }}>
+          <div
+            className="w-full max-w-md rounded-2xl overflow-hidden"
+            style={{
+              backgroundColor: 'var(--bg-secondary)',
+              border: '1px solid var(--border-primary)',
+              boxShadow: '0 25px 60px rgba(0,0,0,0.5)',
+            }}
+          >
+            {/* Modal Header */}
+            <div
+              className="p-6 pb-4 text-center"
+              style={{
+                background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(59, 130, 246, 0.15))',
+                borderBottom: '1px solid var(--border-primary)',
+              }}
+            >
+              <div className="text-4xl mb-3">✨</div>
+              <h2 className="text-xl font-bold mb-1">Upgrade to Pro</h2>
+              <p className="text-sm text-[var(--text-secondary)]">
+                Get more AI-powered CV summaries
+              </p>
+            </div>
+
+            {/* Pricing */}
+            <div className="p-6">
+              {/* Free Tier */}
+              <div className="p-4 rounded-xl mb-3" style={{ backgroundColor: 'var(--bg-elevated)', border: '1px solid var(--border-primary)' }}>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="font-bold">Free</span>
+                  <span className="font-mono text-lg font-bold text-[var(--text-tertiary)]">$0</span>
+                </div>
+                <ul className="space-y-1.5">
+                  <li className="flex items-center gap-2 text-sm text-[var(--text-secondary)]">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent-green)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
+                    2 AI summaries
+                  </li>
+                  <li className="flex items-center gap-2 text-sm text-[var(--text-secondary)]">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent-green)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
+                    PDF export
+                  </li>
+                  <li className="flex items-center gap-2 text-sm text-[var(--text-secondary)]">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent-green)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
+                    Verified badge
+                  </li>
+                </ul>
+              </div>
+
+              {/* Pro Tier */}
+              <div
+                className="p-4 rounded-xl relative"
+                style={{
+                  background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(59, 130, 246, 0.1))',
+                  border: '2px solid rgba(139, 92, 246, 0.4)',
+                }}
+              >
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider" style={{ background: 'linear-gradient(135deg, #8b5cf6, #6366f1)', color: 'white' }}>
+                  Most Popular
+                </div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="font-bold">Pro</span>
+                  <div className="text-right">
+                    <span className="font-mono text-2xl font-bold" style={{ color: '#8b5cf6' }}>$1.99</span>
+                    <span className="text-xs text-[var(--text-tertiary)] block">one-time</span>
+                  </div>
+                </div>
+                <ul className="space-y-1.5">
+                  <li className="flex items-center gap-2 text-sm text-[var(--text-secondary)]">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
+                    <strong style={{ color: '#8b5cf6' }}>25 AI summaries</strong>
+                  </li>
+                  <li className="flex items-center gap-2 text-sm text-[var(--text-secondary)]">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
+                    Everything in Free
+                  </li>
+                  <li className="flex items-center gap-2 text-sm text-[var(--text-secondary)]">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
+                    ~$0.08 per summary
+                  </li>
+                </ul>
+              </div>
+
+              {/* Payment Methods */}
+              <div className="mt-4 text-center">
+                <p className="text-[10px] font-mono text-[var(--text-tertiary)] uppercase tracking-wider mb-2">
+                  Accepts
+                </p>
+                <div className="flex items-center justify-center gap-3 text-xs text-[var(--text-secondary)]">
+                  <span className="px-2 py-1 rounded" style={{ backgroundColor: 'var(--bg-elevated)' }}>💳 Cards</span>
+                  <span className="px-2 py-1 rounded" style={{ backgroundColor: 'var(--bg-elevated)' }}>🏦 Bank</span>
+                  <span className="px-2 py-1 rounded" style={{ backgroundColor: 'var(--bg-elevated)' }}>📱 QRIS</span>
+                  <span className="px-2 py-1 rounded" style={{ backgroundColor: 'var(--bg-elevated)' }}>💰 E-Wallet</span>
+                </div>
+              </div>
+
+              {/* CTA */}
+              <button
+                onClick={handleUpgrade}
+                disabled={isProcessingPayment}
+                className="w-full mt-5 py-3 rounded-xl text-sm font-bold text-white transition-all flex items-center justify-center gap-2"
+                style={{
+                  background: isProcessingPayment
+                    ? 'rgba(139, 92, 246, 0.5)'
+                    : 'linear-gradient(135deg, #8b5cf6, #6366f1)',
+                  boxShadow: isProcessingPayment ? 'none' : '0 4px 15px rgba(139, 92, 246, 0.4)',
+                }}
+              >
+                {isProcessingPayment ? (
+                  <>
+                    <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    Redirecting to payment...
+                  </>
+                ) : (
+                  'Upgrade to Pro — $1.99'
+                )}
+              </button>
+
+              <button
+                onClick={() => setShowUpgradeModal(false)}
+                className="w-full mt-3 py-2 text-sm text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] transition-all"
+              >
+                Maybe later
+              </button>
+            </div>
+
+            {/* Footer */}
+            <div className="px-6 py-3 text-center" style={{ borderTop: '1px solid var(--border-primary)' }}>
+              <p className="text-[10px] text-[var(--text-tertiary)]">
+                🔒 Secure payment via Xendit · No subscription · Buy once, use anytime
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

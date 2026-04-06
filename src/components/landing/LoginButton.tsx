@@ -10,13 +10,21 @@ export default function LoginButton({ variant = 'default' }: LoginButtonProps) {
   const supabase = createClient()
 
   const handleLogin = async () => {
-    await supabase.auth.signInWithOAuth({
+    console.log('Start login process...')
+    const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'github',
       options: {
         redirectTo: `${window.location.origin}/auth/callback`,
         scopes: 'read:user repo',
       },
     })
+    
+    if (error) {
+      console.error('Supabase login error:', error.message)
+      alert(`Login failed: ${error.message}`)
+    } else {
+      console.log('Auth request successful:', data)
+    }
   }
 
   if (variant === 'large') {

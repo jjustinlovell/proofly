@@ -13,6 +13,23 @@ interface SummarizeRequest {
   languages: string[]
 }
 
+export async function getAICredits() {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user) {
+    return { credits: 0 }
+  }
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('ai_credits')
+    .eq('id', user.id)
+    .single()
+
+  return { credits: profile?.ai_credits ?? 0 }
+}
+
 export async function summarizeRepo(request: SummarizeRequest) {
   // Verify authenticated user
   const supabase = await createClient()
@@ -20,6 +37,23 @@ export async function summarizeRepo(request: SummarizeRequest) {
 
   if (!user) {
     return { success: false, error: 'Not authenticated' }
+  }
+
+  // Check credits
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('ai_credits')
+    .eq('id', user.id)
+    .single()
+
+  const credits = profile?.ai_credits ?? 0
+
+  if (credits <= 0) {
+    return { 
+      success: false, 
+      error: 'NO_CREDITS',
+      message: 'You have no AI credits remaining. Upgrade to Pro for 25 more credits.' 
+    }
   }
 
   const apiKey = process.env.OPENAI_API_KEY
@@ -96,7 +130,13 @@ HARD RULES:
       return { success: false, error: 'No summary generated' }
     }
 
-    return { success: true, summary }
+    // Deduct 1 credit on successful generation
+    await supabase
+      .from('profiles')
+      .update({ ai_credits: credits - 1 })
+      .eq('id', user.id)
+
+    return { success: true, summary, remainingCredits: credits - 1 }
   } catch (err) {
     console.error('AI summarization error:', err)
     return { success: false, error: 'Failed to generate summary' }

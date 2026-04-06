@@ -50,10 +50,14 @@ export async function GET(request: Request) {
         }
       }
 
+      const appUrl = process.env.NEXT_PUBLIC_APP_URL || origin
+      
       const forwardedHost = request.headers.get('x-forwarded-host')
       const isLocalEnv = process.env.NODE_ENV === 'development'
 
-      if (isLocalEnv) {
+      if (process.env.NEXT_PUBLIC_APP_URL) {
+        return NextResponse.redirect(`${process.env.NEXT_PUBLIC_APP_URL}${next}`)
+      } else if (isLocalEnv) {
         return NextResponse.redirect(`${origin}${next}`)
       } else if (forwardedHost) {
         return NextResponse.redirect(`https://${forwardedHost}${next}`)
@@ -63,6 +67,7 @@ export async function GET(request: Request) {
     }
   }
 
+  const errorAppUrl = process.env.NEXT_PUBLIC_APP_URL || origin
   // Auth error — redirect to landing with error
-  return NextResponse.redirect(`${origin}/?error=auth_failed`)
+  return NextResponse.redirect(`${errorAppUrl}/?error=auth_failed`)
 }
