@@ -10,6 +10,13 @@ interface Log {
   created_at: string
 }
 
+export interface RepoSummary {
+  repoName: string
+  summary: string
+  techStack: string[]
+  commitCount: number
+}
+
 interface CVPreviewProps {
   profile: {
     username: string
@@ -27,23 +34,41 @@ interface CVPreviewProps {
     techStack: boolean
   }
   topLanguages: { language: string; size: number }[]
+  repoSummaries?: Record<string, RepoSummary>
+  selectedRepos?: string[]
 }
 
-export default function CVPreview({ profile, logs, theme, sections, topLanguages }: CVPreviewProps) {
+export default function CVPreview({ profile, logs, theme, sections, topLanguages, repoSummaries = {}, selectedRepos }: CVPreviewProps) {
   const isLight = theme === 'light'
 
   // Only include verified GitHub contributions to maintain CV integrity
   const githubLogsOnly = logs.filter(log => !!log.github_data?.repo)
 
-  // Group logs by time period
+  // If selectedRepos is provided, filter to only those repos
+  const filteredLogs = selectedRepos && selectedRepos.length > 0
+    ? githubLogsOnly.filter(log => selectedRepos.includes(log.github_data!.repo!))
+    : githubLogsOnly
+
+  // Group logs by repo (instead of time period when summaries exist)
+  const repoGroups = new Map<string, Log[]>()
+  filteredLogs.forEach(log => {
+    const repo = log.github_data!.repo!
+    const existing = repoGroups.get(repo) || []
+    existing.push(log)
+    repoGroups.set(repo, existing)
+  })
+
+  // Also group by quarter for non-summarized view
   const groupedLogs = new Map<string, Log[]>()
-  githubLogsOnly.forEach(log => {
+  filteredLogs.forEach(log => {
     const date = new Date(log.created_at)
     const quarter = `Q${Math.ceil((date.getMonth() + 1) / 3)} ${date.getFullYear()}`
     const existing = groupedLogs.get(quarter) || []
     existing.push(log)
     groupedLogs.set(quarter, existing)
   })
+
+  const hasSummaries = Object.keys(repoSummaries).length > 0
 
   const totalLangSize = topLanguages.reduce((sum, lang) => sum + lang.size, 0) || 1
 
@@ -85,49 +110,118 @@ export default function CVPreview({ profile, logs, theme, sections, topLanguages
           {sections.dailyLogs && (
             <div>
               <h2 className="font-bold text-sm uppercase tracking-widest mb-2" style={{ color: mutedColor }}>
-                Verified Proof of Work
+                {hasSummaries ? 'Project Experience' : 'Verified Proof of Work'}
               </h2>
               <p className="text-xs mb-8 max-w-lg font-mono tracking-tight" style={{ color: mutedColor }}>
-                * Exclusively verified GitHub contributions; manual unverified entries are omitted to maintain absolute integrity.
+                {hasSummaries
+                  ? '* AI-enhanced summaries based on verified GitHub contributions.'
+                  : '* Exclusively verified GitHub contributions; manual unverified entries are omitted to maintain absolute integrity.'
+                }
               </p>
 
-              {Array.from(groupedLogs.entries()).slice(0, 3).map(([quarter, qLogs]) => (
-                <div key={quarter} className="mb-8">
-                  <div className="flex items-center gap-2 mb-3">
-                    <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: accentColor }} />
-                    <span className="text-sm font-bold" style={{ color: accentColor }}>{quarter} — Present</span>
-                  </div>
+              {hasSummaries ? (
+                // AI Summary view — group by repo with descriptions
+                Array.from(repoGroups.entries()).map(([repo, rLogs]) => {
+                  const summary = repoSummaries[repo]
+                  const repoDisplayName = repo.split('/').pop() || repo
+                  
+                  // Get date range
+                  const dates = rLogs.map(l => new Date(l.created_at))
+                  const earliest = new Date(Math.min(...dates.map(d => d.getTime())))
+                  const latest = new Date(Math.max(...dates.map(d => d.getTime())))
+                  const dateRange = `${earliest.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })} — ${latest.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}`
 
-                  {/* Group title from first log */}
-                  <h3 className="text-lg font-bold mb-3" style={{ color: textColor }}>
-                    {qLogs[0]?.github_data?.repo?.split('/').pop() || 'Development Work'}
-                  </h3>
+                  return (
+                    <div key={repo} className="mb-8">
+                      <div className="flex items-center gap-2 mb-1">
+                        <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: accentColor }} />
+                        <span className="text-sm font-bold" style={{ color: accentColor }}>{dateRange}</span>
+                      </div>
 
-                  <div className="space-y-3 ml-2">
-                    {qLogs.slice(0, 10).map(log => {
-                      const commitMsg = log.github_data!.commit_message 
-                      
-                      return (
-                        <div key={log.id} className="flex flex-col gap-1 pl-3 border-l-2" style={{ borderColor: isLight ? '#e5e7eb' : 'var(--border-primary)' }}>
-                          <div className="flex items-center gap-2">
-                            {log.github_data?.commit_sha && (
-                              <span style={{ color: mutedColor }} className="font-mono text-xs">
-                                {log.github_data.commit_sha.slice(0, 7)}
-                              </span>
-                            )}
-                            <span className="font-mono text-[10px] uppercase font-bold tracking-widest border px-1.5 py-0.5 rounded" style={{ color: accentColor, borderColor: accentColor }}>
-                              {log.github_data!.repo!.split('/').pop()}
+                      <h3 className="text-lg font-bold mb-2" style={{ color: textColor }}>
+                        {repoDisplayName}
+                      </h3>
+
+                      {/* Tech stack tags */}
+                      {summary?.techStack && summary.techStack.length > 0 && (
+                        <div className="flex flex-wrap gap-1.5 mb-3">
+                          {summary.techStack.map(tech => (
+                            <span
+                              key={tech}
+                              className="font-mono text-[10px] uppercase font-bold tracking-widest border px-1.5 py-0.5 rounded"
+                              style={{ color: accentColor, borderColor: accentColor }}
+                            >
+                              {tech}
                             </span>
-                          </div>
-                          <p className="text-sm" style={{ color: textColor }}>
-                            {commitMsg}
-                          </p>
+                          ))}
                         </div>
-                      )
-                    })}
+                      )}
+
+                      {/* AI Summary */}
+                      {summary?.summary ? (
+                        <p className="text-sm leading-relaxed mb-3 pl-3 border-l-2" style={{ color: textColor, borderColor: isLight ? '#e5e7eb' : 'var(--border-primary)' }}>
+                          {summary.summary}
+                        </p>
+                      ) : (
+                        // Fallback: show commits
+                        <div className="space-y-2 ml-2">
+                          {rLogs.slice(0, 5).map(log => (
+                            <div key={log.id} className="flex flex-col gap-1 pl-3 border-l-2" style={{ borderColor: isLight ? '#e5e7eb' : 'var(--border-primary)' }}>
+                              <p className="text-sm" style={{ color: textColor }}>
+                                {log.github_data!.commit_message}
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* Commit count */}
+                      <p className="text-xs font-mono mt-2" style={{ color: mutedColor }}>
+                        {rLogs.length} verified commit{rLogs.length !== 1 ? 's' : ''}
+                      </p>
+                    </div>
+                  )
+                })
+              ) : (
+                // Original quarter-based view
+                Array.from(groupedLogs.entries()).slice(0, 3).map(([quarter, qLogs]) => (
+                  <div key={quarter} className="mb-8">
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: accentColor }} />
+                      <span className="text-sm font-bold" style={{ color: accentColor }}>{quarter} — Present</span>
+                    </div>
+
+                    {/* Group title from first log */}
+                    <h3 className="text-lg font-bold mb-3" style={{ color: textColor }}>
+                      {qLogs[0]?.github_data?.repo?.split('/').pop() || 'Development Work'}
+                    </h3>
+
+                    <div className="space-y-3 ml-2">
+                      {qLogs.slice(0, 10).map(log => {
+                        const commitMsg = log.github_data!.commit_message 
+                        
+                        return (
+                          <div key={log.id} className="flex flex-col gap-1 pl-3 border-l-2" style={{ borderColor: isLight ? '#e5e7eb' : 'var(--border-primary)' }}>
+                            <div className="flex items-center gap-2">
+                              {log.github_data?.commit_sha && (
+                                <span style={{ color: mutedColor }} className="font-mono text-xs">
+                                  {log.github_data.commit_sha.slice(0, 7)}
+                                </span>
+                              )}
+                              <span className="font-mono text-[10px] uppercase font-bold tracking-widest border px-1.5 py-0.5 rounded" style={{ color: accentColor, borderColor: accentColor }}>
+                                {log.github_data!.repo!.split('/').pop()}
+                              </span>
+                            </div>
+                            <p className="text-sm" style={{ color: textColor }}>
+                              {commitMsg}
+                            </p>
+                          </div>
+                        )
+                      })}
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           )}
         </div>
