@@ -2,7 +2,19 @@
 
 import { useState, useRef, useEffect, useTransition, useCallback } from 'react'
 import CVPreview, { type RepoSummary } from '@/components/cv/CVPreview'
-import { summarizeRepo, getAICredits } from './actions'
+import { summarizeRepo, getAICredits, getGitHubRepos, getRemoteRepoCommits } from './actions'
+
+interface BaseLog {
+  id: string
+  content: string
+  created_at: string
+  is_verified: boolean
+  github_data: {
+    repo?: string
+    commit_sha?: string
+    commit_message?: string
+  } | null
+}
 
 interface Profile {
   username: string
@@ -11,69 +23,89 @@ interface Profile {
   current_streak: number
   verified_streak: number
   best_streak: number
+  github_access_token?: string
   ai_credits: number
 }
 
-interface Log {
-  id: string
-  content: string
-  is_verified: boolean
-  github_data: {
-    repo?: string
-    commit_sha?: string
-    commit_message?: string
-  } | null
-  created_at: string
+type SectionKeys = 'dailyLogs' | 'githubContributions' | 'techStack'
+
+interface Props {
+  profile: Profile
+  initialLogs: BaseLog[]
+  topLanguages: { language: string; size: number }[]
 }
 
-export default function CVGeneratorClient({ 
-  profile, 
-  initialLogs,
-  topLanguages
-}: { 
-  profile: Profile; 
-  initialLogs: Log[];
-  topLanguages: { language: string; size: number }[];
-}) {
+export default function CVGeneratorClient({ profile, initialLogs, topLanguages }: Props) {
   const [dateRange, setDateRange] = useState<'30' | '90' | 'all'>('90')
   const [theme, setTheme] = useState<'light' | 'dark'>('dark')
-  const [sections, setSections] = useState({
+  const [sections, setSections] = useState<Record<SectionKeys, boolean>>({
     dailyLogs: true,
     githubContributions: true,
     techStack: true,
   })
-  const [selectedRepos, setSelectedRepos] = useState<string[]>([])
-  const [repoSummaries, setRepoSummaries] = useState<Record<string, RepoSummary>>({})
-  const [summarizingRepo, setSummarizingRepo] = useState<string | null>(null)
-  const [credits, setCredits] = useState(profile.ai_credits ?? 2)
+  
+  const printRef = useRef<HTMLDivElement>(null)
+  
+  // Credits and summarize state
+  const [credits, setCredits] = useState(profile.ai_credits || 0)
   const [showUpgradeModal, setShowUpgradeModal] = useState(false)
+  const [summarizingRepo, setSummarizingRepo] = useState<string | null>(null)
+  const [repoSummaries, setRepoSummaries] = useState<Record<string, RepoSummary>>({})
+  const [selectedRepos, setSelectedRepos] = useState<string[]>([])
+  const [isPending, startTransition] = useTransition()
   const [isProcessingPayment, setIsProcessingPayment] = useState(false)
   const [paymentStatus, setPaymentStatus] = useState<'idle' | 'success' | 'failed'>('idle')
-  const [isPending, startTransition] = useTransition()
-  const printRef = useRef<HTMLDivElement>(null)
-
-  // Check for payment callback in URL
+  
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search)
-    const payment = params.get('payment')
-    if (payment === 'success') {
+    const urlParams = new URLSearchParams(window.location.search)
+    if (urlParams.get('payment_status') === 'success') {
       setPaymentStatus('success')
-      // Refresh credits from server
-      getAICredits().then(result => {
-        setCredits(result.credits)
-      })
-      // Clean URL
-      window.history.replaceState({}, '', window.location.pathname)
-      setTimeout(() => setPaymentStatus('idle'), 5000)
-    } else if (payment === 'failed') {
-      setPaymentStatus('failed')
-      window.history.replaceState({}, '', window.location.pathname)
       setTimeout(() => setPaymentStatus('idle'), 5000)
     }
   }, [])
 
-  // Filter logs by date range
-  const filteredLogs = initialLogs.filter(log => {
+  const [remoteLogs, setRemoteLogs] = useState<BaseLog[]>([])
+  const fetchingRepos = useRef<Set<string>>(new Set())
+  const [loadingRepos, setLoadingRepos] = useState<Set<string>>(new Set())
+
+  useEffect(() => {
+    selectedRepos.forEach(repo => {
+      const hasLocalLogs = initialLogs.some(l => l.github_data?.repo === repo)
+      if (!hasLocalLogs && !fetchingRepos.current.has(repo)) {
+        fetchingRepos.current.add(repo)
+        setLoadingRepos(prev => new Set(prev).add(repo))
+        getRemoteRepoCommits(repo)
+          .then(({ commits }) => {
+            if (commits && commits.length > 0) {
+              const newLogs: BaseLog[] = commits.map((c: any) => ({
+                id: c.sha,
+                content: `[GitHub] ${c.message}`,
+                created_at: c.date,
+                is_verified: true,
+                github_data: {
+                  repo,
+                  commit_sha: c.sha,
+                  commit_message: c.message
+                }
+              }))
+              setRemoteLogs(prev => [...prev, ...newLogs])
+            }
+          })
+          .catch(err => {
+            console.error('Failed to fetch remote commits:', err)
+          })
+          .finally(() => {
+            setLoadingRepos(prev => {
+              const next = new Set(prev)
+              next.delete(repo)
+              return next
+            })
+          })
+      }
+    })
+  }, [selectedRepos, initialLogs])
+
+  const filteredInitialLogs = initialLogs.filter(log => {
     if (dateRange === 'all') return true
     const daysAgo = parseInt(dateRange)
     const cutoff = new Date()
@@ -81,21 +113,40 @@ export default function CVGeneratorClient({
     return new Date(log.created_at) >= cutoff
   })
 
-  // Extract unique repos from filtered logs
-  const allRepos = Array.from(
+  // remoteLogs bypass the date filter because if a user explicitly selects a remote repo to include, 
+  // its recent commits should be displayed regardless of how long ago the project was last active.
+  const filteredLogs = [...filteredInitialLogs, ...remoteLogs]
+
+  const [publicRepos, setPublicRepos] = useState<string[]>([])
+
+  useEffect(() => {
+    if (profile.username) {
+      getGitHubRepos(profile.username).then(repos => {
+        setPublicRepos(repos)
+      })
+    }
+  }, [profile.username])
+
+  // Extract unique repos from filtered logs and merge with public repos
+  const logRepos = Array.from(
     new Set(
       filteredLogs
         .filter(log => !!log.github_data?.repo)
         .map(log => log.github_data!.repo!)
     )
   )
+  
+  const allRepos = Array.from(new Set([...logRepos, ...publicRepos]))
 
-  // Auto-select all repos on first load
+  // Auto-select repos that have manual logs on first load, or all if none
+  const [hasAutoSelected, setHasAutoSelected] = useState(false)
   useEffect(() => {
-    if (selectedRepos.length === 0 && allRepos.length > 0) {
-      setSelectedRepos(allRepos)
+    if (!hasAutoSelected && allRepos.length > 0) {
+      // By default, just select tracked ones to save credits, if any. Else select a few.
+      setSelectedRepos(logRepos.length > 0 ? logRepos : allRepos.slice(0, 3))
+      setHasAutoSelected(true)
     }
-  }, [allRepos.join(',')])
+  }, [allRepos, logRepos, hasAutoSelected])
 
   // Get commits for a specific repo
   const getRepoCommits = (repo: string) => {
@@ -253,6 +304,7 @@ export default function CVGeneratorClient({
             topLanguages={topLanguages}
             repoSummaries={repoSummaries}
             selectedRepos={selectedRepos}
+            loadingRepos={loadingRepos}
           />
         </div>
 
@@ -394,7 +446,18 @@ export default function CVGeneratorClient({
 
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium truncate">{repoDisplay}</p>
-                      <p className="text-xs font-mono text-[var(--text-tertiary)]">{commitCount} commits</p>
+                      <p className="text-xs font-mono text-[var(--text-tertiary)]">
+                        {loadingRepos.has(repo) ? (
+                          <span className="flex items-center gap-1">
+                            <span className="inline-block w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                            Fetching commits...
+                          </span>
+                        ) : commitCount > 0 ? (
+                          `${commitCount} tracked commits`
+                        ) : (
+                          'Remote repository'
+                        )}
+                      </p>
                     </div>
 
                     {isSummarized ? (
@@ -448,7 +511,7 @@ export default function CVGeneratorClient({
                     Summarizing...
                   </>
                 ) : (
-                  <>✨ Summarize All ({selectedRepos.length - summarizedCount} remaining)</>
+                  <>✨ Summarize All</>
                 )}
               </button>
             )}
@@ -500,7 +563,7 @@ export default function CVGeneratorClient({
           </div>
 
           {/* Info Card */}
-          <div className="card-static p-4 border-l-2 border-l-[var(--accent-blue)]">
+          {/* <div className="card-static p-4 border-l-2 border-l-[var(--accent-blue)]">
             <div className="flex items-center gap-2 mb-2">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent-blue)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="12" cy="12" r="10" />
@@ -512,7 +575,7 @@ export default function CVGeneratorClient({
             <p className="text-xs text-[var(--text-secondary)]">
               Generated CVs with 90+ days of proof of work have a 3.4x higher response rate from recruiters.
             </p>
-          </div>
+          </div> */}
         </div>
       </div>
 

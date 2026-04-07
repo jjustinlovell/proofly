@@ -13,6 +13,28 @@ interface SummarizeRequest {
   languages: string[]
 }
 
+export async function getGitHubRepos(username: string) {
+  try {
+    const res = await fetch(`https://api.github.com/users/${username}/repos?type=public&sort=updated&per_page=100`, {
+      headers: {
+        'Accept': 'application/vnd.github.v3+json'
+      },
+      next: { revalidate: 3600 }
+    })
+    
+    if (!res.ok) {
+      console.error('Failed to fetch github repos:', res.statusText)
+      return []
+    }
+    
+    const repos = await res.json()
+    return repos.map((r: any) => r.full_name)
+  } catch (err) {
+    console.error('Error fetching github repos:', err)
+    return []
+  }
+}
+
 export async function getAICredits() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -42,11 +64,11 @@ export async function summarizeRepo(request: SummarizeRequest) {
   // Check credits
   const { data: profile } = await supabase
     .from('profiles')
-    .select('ai_credits')
+    .select('ai_credits, github_access_token')
     .eq('id', user.id)
     .single()
 
-  const credits = profile?.ai_credits ?? 0
+      const credits = profile?.ai_credits ?? 0
 
   if (credits <= 0) {
     return { 
@@ -63,8 +85,20 @@ export async function summarizeRepo(request: SummarizeRequest) {
 
   const { repoName, commits, languages } = request
 
+  let finalCommits = commits
+
+  // If no tracked commits exist for this repo in the DB logs, fetch from GitHub directly
+  if (finalCommits.length === 0) {
+    try {
+      const { commits: fetchedCommits } = await getRemoteRepoCommits(repoName)
+      finalCommits = fetchedCommits
+    } catch (err) {
+      console.error('Failed to fetch fallback commits from GitHub:', err)
+    }
+  }
+
   // Build a concise summary of the commits for context
-  const commitSummary = commits
+  const commitSummary = finalCommits
     .slice(0, 30) // limit to 30 most recent commits
     .map(c => `- ${c.message}`)
     .join('\n')
@@ -124,21 +158,70 @@ HARD RULES:
     }
 
     const data = await response.json()
-    const summary = data.choices?.[0]?.message?.content?.trim()
+    const responseText = data.choices?.[0]?.message?.content?.trim()
 
-    if (!summary) {
+    if (!responseText) {
       return { success: false, error: 'No summary generated' }
     }
 
     // Deduct 1 credit on successful generation
-    await supabase
+    const newCredits = credits - 1
+    const { error: dbError } = await supabase
       .from('profiles')
-      .update({ ai_credits: credits - 1 })
+      .update({ ai_credits: newCredits })
       .eq('id', user.id)
 
-    return { success: true, summary, remainingCredits: credits - 1 }
-  } catch (err) {
-    console.error('AI summarization error:', err)
-    return { success: false, error: 'Failed to generate summary' }
+    if (dbError) {
+      return { success: false, error: 'Database update failed', details: dbError }
+    }
+
+    return { 
+      success: true, 
+      summary: responseText, 
+      remainingCredits: newCredits
+    }
+  } catch (error) {
+    console.error('Error in summarizeRepo:', error)
+    return { success: false, error: 'Internal server error' }
   }
+}
+
+export async function getRemoteRepoCommits(repoName: string) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user) return { commits: [] }
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('github_access_token')
+    .eq('id', user.id)
+    .single()
+
+  try {
+    const headers: Record<string, string> = {
+      'Accept': 'application/vnd.github.v3+json'
+    }
+    if (profile?.github_access_token) {
+      headers['Authorization'] = `token ${profile.github_access_token}`
+    }
+    
+    const res = await fetch(`https://api.github.com/repos/${repoName}/commits?per_page=30`, { headers })
+    if (res.ok) {
+      const data = await res.json()
+      if (Array.isArray(data)) {
+        return { 
+          commits: data.map((c: any) => ({
+            sha: c.sha,
+            message: c.commit?.message || '',
+            date: c.commit?.author?.date || new Date().toISOString()
+          }))
+        }
+      }
+    }
+  } catch (err) {
+    console.error('Failed to fetch commits from GitHub:', err)
+  }
+
+  return { commits: [] }
 }
